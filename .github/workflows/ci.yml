@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Check Launcher
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x launcher/gradlew
+
+      - name: Run checks and lint
+        working-directory: launcher
+        run: ./gradlew check
+
+      - name: Build Release APK
+        working-directory: launcher
+        run: ./gradlew assembleRelease
+
+      - name: Upload Release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: launcher-release-apk
+          path: launcher/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
