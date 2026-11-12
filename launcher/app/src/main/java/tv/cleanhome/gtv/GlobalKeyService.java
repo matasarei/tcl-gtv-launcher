@@ -17,6 +17,7 @@ public class GlobalKeyService extends AccessibilityService {
     // Known OEM and Android keycodes
     private static final int KEYCODE_TCL_SET = 4077;
     private static final int KEYCODE_TCL_QUICK_MENU = 4020;
+    private static final int KEYCODE_TCL_PROFILE = 4016;
     private static final int KEYCODE_TCL_YOUTUBE = 4065;
     private static final int KEYCODE_TCL_NETFLIX = 4062;
     private static final int KEYCODE_TCL_PRIMEVIDEO = 4099;
@@ -111,7 +112,9 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private boolean isProfileKey(int code) {
-        return code == 288 || code == KeyEvent.KEYCODE_PROFILE_SWITCH;
+        return code == KEYCODE_TCL_PROFILE ||
+                code == 288 ||
+                code == KeyEvent.KEYCODE_PROFILE_SWITCH;
     }
 
     private boolean isTvKey(int code) {
@@ -137,17 +140,12 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openAccounts() {
-        Intent[] intents = new Intent[]{
-                new Intent(Settings.ACTION_SETTINGS),
-                new Intent(this, QuickSettingsActivity.class)
-        };
-        for (Intent intent : intents) {
-            try {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return;
-            } catch (Exception ignored) {}
-        }
+        Intent intent = new Intent(this, QuickSettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
+        try {
+            startActivity(intent);
+        } catch (Exception ignored) {}
     }
 
     private void openTvInputs() {

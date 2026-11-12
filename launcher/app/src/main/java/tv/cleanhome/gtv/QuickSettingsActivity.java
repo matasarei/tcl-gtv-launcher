@@ -28,6 +28,7 @@ public class QuickSettingsActivity extends Activity {
     private static final String TAG = "QuickSettings";
 
     public static final String ACTION_REFRESH_ALBUM = "tv.cleanhome.gtv.ACTION_REFRESH_ALBUM";
+    public static final String EXTRA_FOCUS_TILE = "extra_focus_tile";
 
     static final int WHITE = 0xFFE3E3E3, GREY = 0xFFC4C7C5, DARK_TEXT = 0xFF1B1F23;
     static final int PANEL = 0xFF121B21, TILE = 0xFF1C262C, TILE_FOCUS = 0xFFCCE8FF;
@@ -79,6 +80,14 @@ public class QuickSettingsActivity extends Activity {
         panel.animate().translationX(0).alpha(1f).setDuration(240)
                 .setInterpolator(new DecelerateInterpolator())
                 .withEndAction(() -> {
+                    String target = getIntent() != null ? getIntent().getStringExtra(EXTRA_FOCUS_TILE) : null;
+                    if (target != null) {
+                        View targetView = tiles.findViewWithTag(target);
+                        if (targetView != null) {
+                            targetView.requestFocus();
+                            return;
+                        }
+                    }
                     if (tiles.getChildCount() > 0) {
                         View firstRow = tiles.getChildAt(0);
                         if (firstRow instanceof ViewGroup && ((ViewGroup) firstRow).getChildCount() > 0) {
@@ -95,6 +104,9 @@ public class QuickSettingsActivity extends Activity {
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
                         new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
+                {"Accounts", R.drawable.ic_account, new Intent[]{
+                        new Intent(Settings.ACTION_SETTINGS),
+                        new Intent(Settings.ACTION_ADD_ACCOUNT)}},
                 {"Inputs", R.drawable.ic_input, new Intent[]{new Intent("com.android.tv.action.VIEW_INPUTS")}},
                 {"Picture", R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
                 {"Network", R.drawable.ic_ethernet, new Intent[]{
@@ -118,6 +130,7 @@ public class QuickSettingsActivity extends Activity {
                 tiles.addView(row, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
             LinearLayout tile = new LinearLayout(this);
+            tile.setTag(entries[i][0]);
             tile.setGravity(Gravity.CENTER_VERTICAL);
             tile.setPadding(dp(12), 0, dp(6), 0);
             tile.setFocusable(true);
@@ -186,7 +199,8 @@ public class QuickSettingsActivity extends Activity {
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             int code = event.getKeyCode();
-            if (code == 4077 || code == 176 || code == KeyEvent.KEYCODE_SETTINGS || code == KeyEvent.KEYCODE_MENU) {
+            if (code == 4077 || code == 176 || code == KeyEvent.KEYCODE_SETTINGS || code == KeyEvent.KEYCODE_MENU
+                    || code == 4016 || code == 288 || code == KeyEvent.KEYCODE_PROFILE_SWITCH) {
                 dismiss();
                 return true;
             }
@@ -197,6 +211,15 @@ public class QuickSettingsActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
+        String target = intent != null ? intent.getStringExtra(EXTRA_FOCUS_TILE) : null;
+        if (target != null) {
+            View targetView = tiles.findViewWithTag(target);
+            if (targetView != null) {
+                targetView.requestFocus();
+                return;
+            }
+        }
         dismiss();
     }
 
