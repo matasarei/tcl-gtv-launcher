@@ -969,14 +969,18 @@ public class MainActivity extends Activity {
 
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
-        if (e.getAction() == KeyEvent.ACTION_DOWN) {
-            if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU) {
+        // 4077 is TCL's proprietary OEM keycode for the remote's physical Settings button.
+        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 showQuick(quickPanel.getVisibility() != View.VISIBLE);
-                return true;
             }
-            if (k == KeyEvent.KEYCODE_TV_INPUT) {
-                if (start(new Intent("com.android.tv.action.VIEW_INPUTS"))) return true;
+            return true;
+        }
+        if (k == KeyEvent.KEYCODE_TV_INPUT) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                start(new Intent("com.android.tv.action.VIEW_INPUTS"));
             }
+            return true;
         }
         if (arrangeRow != null) {
             boolean down = e.getAction() == KeyEvent.ACTION_DOWN;
