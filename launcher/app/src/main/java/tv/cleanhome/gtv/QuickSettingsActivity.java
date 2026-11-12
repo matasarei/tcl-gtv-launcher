@@ -213,9 +213,9 @@ public class QuickSettingsActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         String target = intent != null ? intent.getStringExtra(EXTRA_FOCUS_TILE) : null;
-        if (target != null) {
+        if (target != null && tiles != null) {
             View targetView = tiles.findViewWithTag(target);
-            if (targetView != null) {
+            if (targetView != null && !targetView.isFocused()) {
                 targetView.requestFocus();
                 return;
             }
