@@ -11,3 +11,4 @@ launcher/local.properties
 *.apk
 .DS_Store
 .tasks/
+.gku/
