@@ -54,6 +54,7 @@ This is a dedicated fork of [alexkev/tcl-gtv-launcher](https://github.com/alexke
 - **Continue watching:** Integrates with Android TV's Watch Next API (Netflix, HBO Max, Disney+, Paramount+, etc.) plus dedicated YouTube rows.
 - **Plex integration:** Stream media from your Plex server directly via [Plezy](https://github.com/edde746/plezy) or standard intent links.
 - **Apps grid:** Full grid of installed apps; long press OK to uninstall.
+- **Multilingual:** Full localization support for all 24 official EU languages plus Ukrainian and Russian, automatically adapting to the TV's system language.
 - **Safe debloat:** Automated disable list in `kit/debloat.txt` that shuts off TCL telemetry, ad banners, and background bloatware without breaking system functionality.
 
 ---

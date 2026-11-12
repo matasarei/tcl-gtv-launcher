@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Home</string>
+    <string name="app_name" translatable="false">Home</string>
 
     <!-- "Your apps" row, in this order. Missing or disabled packages are skipped. -->
     <string-array name="dock_apps">
@@ -17,18 +17,18 @@
 
     <!-- Weather in the top-right corner: a city name or postal code Open-Meteo can find.
          Empty uses the TV's approximate location from its IP address (ipapi.co). -->
-    <string name="weather_city"></string>
+    <string name="weather_city" translatable="false"></string>
     <!-- Temperature unit: "auto" (detected from location / locale), "celsius", or "fahrenheit" -->
-    <string name="temperature_unit">auto</string>
+    <string name="temperature_unit" translatable="false">auto</string>
 
     <!-- Continue watching: hide items not touched for this many days (apps leave stale rows behind). -->
     <integer name="continue_max_age_days">30</integer>
     <integer name="row_limit">20</integer>
 
     <!-- Subscriptions row: YouTube's preview channel with this name. -->
-    <string name="subscriptions_package">com.google.android.youtube.tv</string>
-    <string name="subscriptions_channel">Subscriptions</string>
+    <string name="subscriptions_package" translatable="false">com.google.android.youtube.tv</string>
+    <string name="subscriptions_channel" translatable="false">Subscriptions</string>
 
     <!-- Live button: the TV app that plays the antenna tuner or a live TV app. Empty to hide the tab. -->
-    <string name="live_package">com.tcl.tv</string>
+    <string name="live_package" translatable="false">com.tcl.tv</string>
 </resources>

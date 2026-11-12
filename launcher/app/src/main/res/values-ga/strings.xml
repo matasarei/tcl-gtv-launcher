@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Baile</string>
+    <string name="tab_apps">Aipeanna</string>
+    <string name="tab_live">Teilifís Bheo</string>
+    <string name="action_inputs">Ionchuir</string>
+    <string name="action_screensaver">Spárálaí Scáileáin</string>
+    <string name="action_quick_settings">Socruithe Tapa</string>
+    <string name="section_your_apps">Do chuid aipeanna</string>
+    <string name="section_continue_watching">Lean ar aghaidh ag breathnú</string>
+    <string name="section_recently_added_plex">Curtha leis le déanaí ar Plex</string>
+    <string name="section_for_you_youtube">Duitse ar YouTube</string>
+    <string name="section_subscriptions">Síntiúis</string>
+    <string name="add_app">Cuir aip leis</string>
+    <string name="all_apps">Gach aip</string>
+    <string name="reorder">Atsocraigh</string>
+    <string name="done">Déanta</string>
+    <string name="hint_press_to_move">BRÚIGH LE BOGADH</string>
+    <string name="hint_press_to_confirm">BRÚIGH LE DEIMHNIÚ</string>
+    <string name="action_move">Bog</string>
+    <string name="action_remove_from_dock">Bain de Do chuid aipeanna</string>
+    <string name="add_to_dock_title">Cuir le Do chuid aipeanna</string>
+    <string name="all_apps_already_added">Tá gach aip suiteáilte curtha leis cheana féin.</string>
+    <string name="close">Dún</string>
+    <string name="settings">Socruithe</string>
+    <string name="tile_apps">Aipeanna</string>
+    <string name="tile_accounts">Cuntais</string>
+    <string name="tile_inputs">Ionchuir</string>
+    <string name="tile_picture">Íomhá</string>
+    <string name="tile_network">Líonra</string>
+    <string name="tile_remotes">Cianrialtáin</string>
+    <string name="tile_accessibility">Inrochtaineacht</string>
+    <string name="tile_screensaver">Spárálaí</string>
+    <string name="tile_refresh_album">Athnuaigh an t-albam</string>
+    <string name="plex_link_title">Nasc freastalaí Plex</string>
+    <string name="plex_getting_code">Cód á fháil…</string>
+    <string name="plex_link_dialog_title">Nasc Plex</string>
+    <string name="cancel">Cealaigh</string>
+    <string name="plex_code_instructions">Ar do ghuthán nó do ríomhaire, téigh go\nplex.tv/link\nagus cuir isteach\n\n%1$s</string>
+    <string name="plex_error_connection">Níorbh fhéidir plex.tv a bhaint amach. Seiceáil nasc idirlín na teilifíse.</string>
+    <string name="arrange_your_apps">Eagraigh do chuid aipeanna</string>
+    <string name="plex_no_server">Nasctha, ach níor fhreagair aon fhreastalaí Plex ar an líonra seo.</string>
+</resources>

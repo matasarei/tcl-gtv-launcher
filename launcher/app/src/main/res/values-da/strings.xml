@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Startside</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_live">Live-tv</string>
+    <string name="action_inputs">Indgange</string>
+    <string name="action_screensaver">Pauseskærm</string>
+    <string name="action_quick_settings">Hurtige indstillinger</string>
+    <string name="section_your_apps">Dine apps</string>
+    <string name="section_continue_watching">Fortsæt med at se</string>
+    <string name="section_recently_added_plex">Nyligt tilføjet på Plex</string>
+    <string name="section_for_you_youtube">Til dig på YouTube</string>
+    <string name="section_subscriptions">Abonnementer</string>
+    <string name="add_app">Tilføj</string>
+    <string name="all_apps">Alle apps</string>
+    <string name="reorder">Omarranger</string>
+    <string name="done">Færdig</string>
+    <string name="hint_press_to_move">TRYK FOR AT FLYTTE</string>
+    <string name="hint_press_to_confirm">TRYK FOR AT BEKRÆFTE</string>
+    <string name="action_move">Flyt</string>
+    <string name="action_remove_from_dock">Fjern fra Dine apps</string>
+    <string name="add_to_dock_title">Tilføj til Dine apps</string>
+    <string name="all_apps_already_added">Alle installerede apps er allerede tilføjet.</string>
+    <string name="close">Luk</string>
+    <string name="settings">Indstillinger</string>
+    <string name="tile_apps">Apps</string>
+    <string name="tile_accounts">Konti</string>
+    <string name="tile_inputs">Indgange</string>
+    <string name="tile_picture">Billede</string>
+    <string name="tile_network">Netværk</string>
+    <string name="tile_remotes">Fjernbetjeninger</string>
+    <string name="tile_accessibility">Tilgængelighed</string>
+    <string name="tile_screensaver">Pauseskærm</string>
+    <string name="tile_refresh_album">Opdater album</string>
+    <string name="plex_link_title">Forbind Plex-server</string>
+    <string name="plex_getting_code">Henter kode…</string>
+    <string name="plex_link_dialog_title">Forbind Plex</string>
+    <string name="cancel">Annuller</string>
+    <string name="plex_code_instructions">Gå til\nplex.tv/link\npå mobil eller computer, og indtast:\n\n%1$s</string>
+    <string name="plex_error_connection">Kunne ikke forbinde til plex.tv. Tjek tv\'ets internetforbindelse.</string>
+    <string name="arrange_your_apps">Arranger dine apps</string>
+    <string name="plex_no_server">Forbundet, men ingen Plex-server svarede på dette netværk.</string>
+</resources>

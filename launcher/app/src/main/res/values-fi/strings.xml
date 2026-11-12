@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Koti</string>
+    <string name="tab_apps">Sovellukset</string>
+    <string name="tab_live">Live-TV</string>
+    <string name="action_inputs">Tulot</string>
+    <string name="action_screensaver">Näytönsäästäjä</string>
+    <string name="action_quick_settings">Pika-asetukset</string>
+    <string name="section_your_apps">Omat sovellukset</string>
+    <string name="section_continue_watching">Jatka katselua</string>
+    <string name="section_recently_added_plex">Äskettäin lisätty Plexiin</string>
+    <string name="section_for_you_youtube">Sinulle YouTubessa</string>
+    <string name="section_subscriptions">Tilaukset</string>
+    <string name="add_app">Lisää</string>
+    <string name="all_apps">Kaikki sovellukset</string>
+    <string name="reorder">Järjestä uudelleen</string>
+    <string name="done">Valmis</string>
+    <string name="hint_press_to_move">PAINA SIIRTÄÄKSESI</string>
+    <string name="hint_press_to_confirm">PAINA VAHVISTAAKSESI</string>
+    <string name="action_move">Siirrä</string>
+    <string name="action_remove_from_dock">Poista Omista sovelluksista</string>
+    <string name="add_to_dock_title">Lisää Omiin sovelluksiin</string>
+    <string name="all_apps_already_added">Kaikki asennetut sovellukset on jo lisätty.</string>
+    <string name="close">Sulje</string>
+    <string name="settings">Asetukset</string>
+    <string name="tile_apps">Sovellukset</string>
+    <string name="tile_accounts">Tilit</string>
+    <string name="tile_inputs">Tulot</string>
+    <string name="tile_picture">Kuva</string>
+    <string name="tile_network">Verkko</string>
+    <string name="tile_remotes">Kaukosäätimet</string>
+    <string name="tile_accessibility">Esteettömyys</string>
+    <string name="tile_screensaver">Näytönsäästäjä</string>
+    <string name="tile_refresh_album">Päivitä albumi</string>
+    <string name="plex_link_title">Yhdistä Plex-palvelin</string>
+    <string name="plex_getting_code">Haetaan koodia…</string>
+    <string name="plex_link_dialog_title">Yhdistä Plex</string>
+    <string name="cancel">Peruuta</string>
+    <string name="plex_code_instructions">Mene puhelimella tai tietokoneella osoitteeseen\nplex.tv/link\nja syötä:\n\n%1$s</string>
+    <string name="plex_error_connection">Yhteyttä palveluun plex.tv ei saatu. Tarkista television internetyhteys.</string>
+    <string name="arrange_your_apps">Järjestä sovellukset</string>
+    <string name="plex_no_server">Yhdistetty, mutta Plex-palvelinta ei löytynyt tästä verkosta.</string>
+</resources>

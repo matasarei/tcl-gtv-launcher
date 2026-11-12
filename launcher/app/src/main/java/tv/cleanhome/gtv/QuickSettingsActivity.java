@@ -100,28 +100,29 @@ public class QuickSettingsActivity extends Activity {
 
     private void buildTiles() {
         tiles.removeAllViews();
+        String[] tags = {"Apps", "Accounts", "Inputs", "Picture", "Network", "Remotes", "Accessibility", "Screensaver", "Refresh album"};
         Object[][] entries = {
-                {"Apps", R.drawable.ic_apps, new Intent[]{
+                {getString(R.string.tile_apps), R.drawable.ic_apps, new Intent[]{
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
                         new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
-                {"Accounts", R.drawable.ic_account, new Intent[]{
+                {getString(R.string.tile_accounts), R.drawable.ic_account, new Intent[]{
                         new Intent(Settings.ACTION_SETTINGS),
                         new Intent(Settings.ACTION_ADD_ACCOUNT)}},
-                {"Inputs", R.drawable.ic_input, (Runnable) this::openInputs},
-                {"Picture", R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
-                {"Network", R.drawable.ic_ethernet, new Intent[]{
+                {getString(R.string.tile_inputs), R.drawable.ic_input, (Runnable) this::openInputs},
+                {getString(R.string.tile_picture), R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
+                {getString(R.string.tile_network), R.drawable.ic_ethernet, new Intent[]{
                         new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
                         new Intent(Settings.ACTION_WIRELESS_SETTINGS)}},
-                {"Remotes", R.drawable.ic_bluetooth, new Intent[]{
+                {getString(R.string.tile_remotes), R.drawable.ic_bluetooth, new Intent[]{
                         new Intent().setClassName("com.android.tv.settings", "com.tcl.android.tv.settings.accessories.AccessoriesActivity"),
                         new Intent("android.settings.BLUETOOTH_SETTINGS")}},
-                {"Accessibility", R.drawable.ic_accessibility, new Intent[]{
+                {getString(R.string.tile_accessibility), R.drawable.ic_accessibility, new Intent[]{
                         new Intent("android.settings.ACCESSIBILITY_TV_OEM_LINK"),
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
                         new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
-                {"Screensaver", R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
-                {"Refresh album", R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM).setPackage(getPackageName()))},
+                {getString(R.string.tile_screensaver), R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
+                {getString(R.string.tile_refresh_album), R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM).setPackage(getPackageName()))},
         };
 
         LinearLayout row = null;
@@ -131,7 +132,7 @@ public class QuickSettingsActivity extends Activity {
                 tiles.addView(row, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
             LinearLayout tile = new LinearLayout(this);
-            tile.setTag(entries[i][0]);
+            tile.setTag(tags[i]);
             tile.setGravity(Gravity.CENTER_VERTICAL);
             tile.setPadding(dp(12), 0, dp(6), 0);
             tile.setFocusable(true);

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Plocha</string>
+    <string name="tab_apps">Aplikace</string>
+    <string name="tab_live">Živé vysílání</string>
+    <string name="action_inputs">Vstupy</string>
+    <string name="action_screensaver">Spořič obrazovky</string>
+    <string name="action_quick_settings">Rychlé nastavení</string>
+    <string name="section_your_apps">Vaše aplikace</string>
+    <string name="section_continue_watching">Pokračovat ve sledování</string>
+    <string name="section_recently_added_plex">Nedávno přidané na Plexu</string>
+    <string name="section_for_you_youtube">Pro vás na YouTube</string>
+    <string name="section_subscriptions">Odběry</string>
+    <string name="add_app">Přidat</string>
+    <string name="all_apps">Všechny aplikace</string>
+    <string name="reorder">Změnit pořadí</string>
+    <string name="done">Hotovo</string>
+    <string name="hint_press_to_move">STISKNĚTE PRO PŘESUNUTÍ</string>
+    <string name="hint_press_to_confirm">STISKNĚTE PRO POTVRZENÍ</string>
+    <string name="action_move">Přesunout</string>
+    <string name="action_remove_from_dock">Odebrat z Vašich aplikací</string>
+    <string name="add_to_dock_title">Přidat do Vašich aplikací</string>
+    <string name="all_apps_already_added">Všechny nainstalované aplikace jsou již přidány.</string>
+    <string name="close">Zavřít</string>
+    <string name="settings">Nastavení</string>
+    <string name="tile_apps">Aplikace</string>
+    <string name="tile_accounts">Účty</string>
+    <string name="tile_inputs">Vstupy</string>
+    <string name="tile_picture">Obraz</string>
+    <string name="tile_network">Síť</string>
+    <string name="tile_remotes">Ovladače</string>
+    <string name="tile_accessibility">Přístupnost</string>
+    <string name="tile_screensaver">Spořič</string>
+    <string name="tile_refresh_album">Obnovit album</string>
+    <string name="plex_link_title">Propojit server Plex</string>
+    <string name="plex_getting_code">Načítání kódu…</string>
+    <string name="plex_link_dialog_title">Propojit Plex</string>
+    <string name="cancel">Zrušit</string>
+    <string name="plex_code_instructions">Na telefonu nebo počítači přejděte na\nplex.tv/link\na zadejte\n\n%1$s</string>
+    <string name="plex_error_connection">Nelze se připojit k plex.tv. Zkontrolujte připojení k internetu.</string>
+    <string name="arrange_your_apps">Uspořádat aplikace</string>
+    <string name="plex_no_server">Propojeno, ale v této síti nebyl nalezen žádný server Plex.</string>
+</resources>

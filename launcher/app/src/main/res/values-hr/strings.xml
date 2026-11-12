@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Početna</string>
+    <string name="tab_apps">Aplikacije</string>
+    <string name="tab_live">TV uživo</string>
+    <string name="action_inputs">Ulazi</string>
+    <string name="action_screensaver">Čuvar zaslona</string>
+    <string name="action_quick_settings">Brze postavke</string>
+    <string name="section_your_apps">Vaše aplikacije</string>
+    <string name="section_continue_watching">Nastavi gledati</string>
+    <string name="section_recently_added_plex">Nedavno dodano na Plex</string>
+    <string name="section_for_you_youtube">Za vas na YouTubeu</string>
+    <string name="section_subscriptions">Pretplate</string>
+    <string name="add_app">Dodaj</string>
+    <string name="all_apps">Sve aplikacije</string>
+    <string name="reorder">Prerasporedi</string>
+    <string name="done">Gotovo</string>
+    <string name="hint_press_to_move">PRITISNITE ZA POMAK</string>
+    <string name="hint_press_to_confirm">PRITISNITE ZA POTVRDU</string>
+    <string name="action_move">Premjesti</string>
+    <string name="action_remove_from_dock">Ukloni iz Vaših aplikacija</string>
+    <string name="add_to_dock_title">Dodaj u Vaše aplikacije</string>
+    <string name="all_apps_already_added">Sve instalirane aplikacije već su dodane.</string>
+    <string name="close">Zatvori</string>
+    <string name="settings">Postavke</string>
+    <string name="tile_apps">Aplikacije</string>
+    <string name="tile_accounts">Računi</string>
+    <string name="tile_inputs">Ulazi</string>
+    <string name="tile_picture">Slika</string>
+    <string name="tile_network">Mreža</string>
+    <string name="tile_remotes">Daljinski</string>
+    <string name="tile_accessibility">Pristupačnost</string>
+    <string name="tile_screensaver">Čuvar zaslona</string>
+    <string name="tile_refresh_album">Osvježi album</string>
+    <string name="plex_link_title">Poveži Plex poslužitelj</string>
+    <string name="plex_getting_code">Dohvaćanje koda…</string>
+    <string name="plex_link_dialog_title">Povezivanje s Plexom</string>
+    <string name="cancel">Odustani</string>
+    <string name="plex_code_instructions">Na telefonu ili računalu otvorite\nplex.tv/link\ni unesite\n\n%1$s</string>
+    <string name="plex_error_connection">Nije moguće kontaktirati plex.tv. Provjerite internetsku vezu televizora.</string>
+    <string name="arrange_your_apps">Rasporedite svoje aplikacije</string>
+    <string name="plex_no_server">Povezano, ali nijedan Plex poslužitelj nije pronađen na ovoj mreži.</string>
+</resources>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Hem</string>
+    <string name="tab_apps">Appar</string>
+    <string name="tab_live">Live-tv</string>
+    <string name="action_inputs">Ingångar</string>
+    <string name="action_screensaver">Skärmsläckare</string>
+    <string name="action_quick_settings">Snabbinställningar</string>
+    <string name="section_your_apps">Dina appar</string>
+    <string name="section_continue_watching">Fortsätt titta</string>
+    <string name="section_recently_added_plex">Nyligen tillagt på Plex</string>
+    <string name="section_for_you_youtube">För dig på YouTube</string>
+    <string name="section_subscriptions">Prenumerationer</string>
+    <string name="add_app">Lägg till</string>
+    <string name="all_apps">Alla appar</string>
+    <string name="reorder">Ordna om</string>
+    <string name="done">Klar</string>
+    <string name="hint_press_to_move">TRYCK FÖR ATT FLYTTA</string>
+    <string name="hint_press_to_confirm">TRYCK FÖR ATT BEKRÄFTA</string>
+    <string name="action_move">Flytta</string>
+    <string name="action_remove_from_dock">Ta bort från Dina appar</string>
+    <string name="add_to_dock_title">Lägg till i Dina appar</string>
+    <string name="all_apps_already_added">Alla installerade appar har redan lagts till.</string>
+    <string name="close">Stäng</string>
+    <string name="settings">Inställningar</string>
+    <string name="tile_apps">Appar</string>
+    <string name="tile_accounts">Konton</string>
+    <string name="tile_inputs">Ingångar</string>
+    <string name="tile_picture">Bild</string>
+    <string name="tile_network">Nätverk</string>
+    <string name="tile_remotes">Fjärrkontroller</string>
+    <string name="tile_accessibility">Tillgänglighet</string>
+    <string name="tile_screensaver">Skärmsläckare</string>
+    <string name="tile_refresh_album">Uppdatera album</string>
+    <string name="plex_link_title">Koppla Plex-server</string>
+    <string name="plex_getting_code">Hämtar kod…</string>
+    <string name="plex_link_dialog_title">Koppla Plex</string>
+    <string name="cancel">Avbryt</string>
+    <string name="plex_code_instructions">Gå till\nplex.tv/link\npå mobilen eller datorn och ange:\n\n%1$s</string>
+    <string name="plex_error_connection">Kunde inte nå plex.tv. Kontrollera tv:ns internetanslutning.</string>
+    <string name="arrange_your_apps">Ordna dina appar</string>
+    <string name="plex_no_server">Kopplad, men ingen Plex-server svarade på detta nätverk.</string>
+</resources>

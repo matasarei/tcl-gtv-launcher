@@ -519,11 +519,11 @@ public class MainActivity extends Activity {
                 homeRows.removeAllViews();
                 View top = new View(this);
                 homeRows.addView(top, new LinearLayout.LayoutParams(-1, topSpacer));
-                LinearLayout appsSection = addSection("Your apps", apps, true);
-                if (!cw.isEmpty()) addSection("Continue watching", cw, false);
-                if (!plexRecent.isEmpty()) addSection("Recently added on Plex", plexRecent, false);
-                if (!forYou.isEmpty()) addSection("For you on YouTube", forYou, false);
-                if (!subs.isEmpty()) addSection("Subscriptions", subs, false);
+                LinearLayout appsSection = addSection(getString(R.string.section_your_apps), apps, true);
+                if (!cw.isEmpty()) addSection(getString(R.string.section_continue_watching), cw, false);
+                if (!plexRecent.isEmpty()) addSection(getString(R.string.section_recently_added_plex), plexRecent, false);
+                if (!forYou.isEmpty()) addSection(getString(R.string.section_for_you_youtube), forYou, false);
+                if (!subs.isEmpty()) addSection(getString(R.string.section_subscriptions), subs, false);
                 View bottom = new View(this);
                 homeRows.addView(bottom, new LinearLayout.LayoutParams(-1, bottomSpacer));
                 // On arrival only Your apps shows, along the bottom over the photo; the rest waits below.
@@ -723,7 +723,7 @@ public class MainActivity extends Activity {
         if (plex.linked()) return plex.recentlyAdded(getResources().getInteger(R.integer.row_limit));
         Item link = new Item();
         link.pkg = app;
-        link.title = "Link your Plex server";
+        link.title = getString(R.string.plex_link_title);
         link.sub = "Show what's new in your movies and TV";
         link.action = this::linkPlex;
         out.add(link);
@@ -732,18 +732,18 @@ public class MainActivity extends Activity {
 
     /** Plex's own TV sign-in: show a code, the owner enters it at plex.tv/link, the row fills in. */
     void linkPlex() {
-        TextView body = caption("Getting a code…", 18, WHITE);
+        TextView body = caption(getString(R.string.plex_getting_code), 18, WHITE);
         body.setSingleLine(false);
         body.setPadding(dp(24), dp(16), dp(24), dp(8));
         AlertDialog dialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle("Link Plex")
+                .setTitle(getString(R.string.plex_link_dialog_title))
                 .setView(body)
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
         io.execute(() -> {
             try {
                 String[] pin = plex.newPin();
-                ui.post(() -> body.setText("On your phone or computer, go to\nplex.tv/link\nand enter\n\n" + pin[1]));
+                ui.post(() -> body.setText(getString(R.string.plex_code_instructions, pin[1])));
                 // ponytail: polls every 2 s for the 15 minutes a Plex PIN lives, stops when the dialog closes
                 for (int i = 0; i < 450 && dialog.isShowing(); i++) {
                     Thread.sleep(2000);
@@ -751,14 +751,14 @@ public class MainActivity extends Activity {
                         boolean found = plex.findServer();
                         ui.post(() -> {
                             dialog.dismiss();
-                            if (!found) body.setText("Linked, but no Plex server answered on this network.");
+                            if (!found) body.setText(getString(R.string.plex_no_server));
                             refreshHome();
                         });
                         return;
                     }
                 }
             } catch (Exception e) {
-                ui.post(() -> body.setText("Couldn't reach plex.tv. Check the TV's internet connection."));
+                ui.post(() -> body.setText(getString(R.string.plex_error_connection)));
             }
         });
     }
@@ -768,7 +768,7 @@ public class MainActivity extends Activity {
     void buildAppsGrid() {
         List<Item> apps = allApps();
         appsGrid.removeAllViews();
-        TextView title = caption("Your apps", 15, GREY);
+        TextView title = caption(getString(R.string.section_your_apps), 15, GREY);
         title.setPadding(dp(8), dp(10), 0, dp(4));
         appsGrid.addView(title);
         int columns = 9;
@@ -833,7 +833,7 @@ public class MainActivity extends Activity {
         d.removeIf(p -> launchIntent(p) == null); // keeps list positions equal to row positions
         int i = d.indexOf(pkg);
         if (i < 0) return;
-        String[] options = {"Move", "Remove from Your apps"};
+        String[] options = {getString(R.string.action_move), getString(R.string.action_remove_from_dock)};
         new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle(label(pkg))
                 .setItems(options, (dialog, which) -> {
@@ -874,18 +874,18 @@ public class MainActivity extends Activity {
         root.setBackground(round(PANEL, dp(24)));
         root.setPadding(dp(28), dp(24), dp(28), dp(24));
 
-        TextView title = caption("Add to Your apps", 20, WHITE);
+        TextView title = caption(getString(R.string.add_to_dock_title), 20, WHITE);
         title.setTypeface(medium);
         LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(-2, -2);
         tlp.bottomMargin = dp(16);
         root.addView(title, tlp);
 
         if (choices.isEmpty()) {
-            TextView empty = caption("All installed apps are already on Your apps.", 15, GREY);
+            TextView empty = caption(getString(R.string.all_apps_already_added), 15, GREY);
             empty.setPadding(0, dp(12), 0, dp(16));
             root.addView(empty);
 
-            TextView close = caption("Close", 15, WHITE);
+            TextView close = caption(getString(R.string.close), 15, WHITE);
             close.setFocusable(true);
             close.setClickable(true);
             close.setBackground(round(TILE, dp(12)));
@@ -997,7 +997,7 @@ public class MainActivity extends Activity {
         arrangeRow = (LinearLayout) row;
         okArmed = false;
         LinearLayout section = (LinearLayout) homeRows.getChildAt(1);
-        ((TextView) section.getChildAt(0)).setText("Arrange your Apps");
+        ((TextView) section.getChildAt(0)).setText(getString(R.string.arrange_your_apps));
         for (int i = 0; i < row.getChildCount(); i++) {
             if (isApp(row.getChildAt(i))) continue;
             row.getChildAt(i).setFocusable(false);
@@ -1012,7 +1012,7 @@ public class MainActivity extends Activity {
         ((ViewGroup) topBar).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         fade(topBar, 0.15f);
 
-        TextView done = caption("Done", 16, WHITE);
+        TextView done = caption(getString(R.string.done), 16, WHITE);
         done.setTypeface(medium);
         done.setGravity(Gravity.CENTER);
         done.setPadding(dp(20), 0, dp(20), 0);
@@ -1051,7 +1051,7 @@ public class MainActivity extends Activity {
         ((ViewGroup) topBar).setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
         fade(topBar, 1f);
         LinearLayout section = (LinearLayout) homeRows.getChildAt(1);
-        ((TextView) section.getChildAt(0)).setText("Your apps");
+        ((TextView) section.getChildAt(0)).setText(getString(R.string.section_your_apps));
         section.removeView(doneButton);
         if (arrangeHint.getParent() != null) ((ViewGroup) arrangeHint.getParent()).removeView(arrangeHint);
     }
@@ -1061,7 +1061,7 @@ public class MainActivity extends Activity {
         if (arrangeHint == null) return;
         if (arrangeHint.getParent() != null) ((ViewGroup) arrangeHint.getParent()).removeView(arrangeHint);
         if (!isApp(now) || now.getParent() != arrangeRow) return;
-        arrangeHint.setText(now == held ? "PRESS TO CONFIRM" : "PRESS TO MOVE");
+        arrangeHint.setText(now == held ? getString(R.string.hint_press_to_confirm) : getString(R.string.hint_press_to_move));
         // Wider than the 91 dp box; the box centres it and doesn't clip, so it spills evenly both ways.
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(150), -2);
         lp.topMargin = dp(6);
@@ -1206,7 +1206,7 @@ public class MainActivity extends Activity {
         icon.setImageTintList(ColorStateList.valueOf(WHITE));
         tile.addView(icon, new LinearLayout.LayoutParams(dp(16), dp(16)));
         tile.addView(new View(this), new LinearLayout.LayoutParams(1, 0, 1));
-        TextView text = caption("Reorder", 13, WHITE);
+        TextView text = caption(getString(R.string.reorder), 13, WHITE);
         tile.addView(text);
         box.addView(tile, new LinearLayout.LayoutParams(dp(75), dp(75)));
         box.setOnFocusChangeListener((v, has) -> {
@@ -1275,7 +1275,7 @@ public class MainActivity extends Activity {
 
     View addAppButton(List<View> captions) {
         Item it = new Item();
-        it.title = "Add app";
+        it.title = getString(R.string.add_app);
         it.pkg = "";
         LinearLayout box = (LinearLayout) appCircle(it, captions);
         ImageView icon = (ImageView) box.getChildAt(0);
@@ -1288,7 +1288,7 @@ public class MainActivity extends Activity {
 
     View allAppsButton(List<View> captions) {
         Item it = new Item();
-        it.title = "All apps";
+        it.title = getString(R.string.all_apps);
         it.pkg = "";
         LinearLayout box = (LinearLayout) appCircle(it, captions);
         ImageView icon = (ImageView) box.getChildAt(0);

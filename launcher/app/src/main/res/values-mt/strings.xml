@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Home</string>
+    <string name="tab_apps">Applikazzjonijiet</string>
+    <string name="tab_live">TV Dirett</string>
+    <string name="action_inputs">Inputs</string>
+    <string name="action_screensaver">Screensaver</string>
+    <string name="action_quick_settings">Settings ta\' Malajr</string>
+    <string name="section_your_apps">L-apps tiegħek</string>
+    <string name="section_continue_watching">Kompli ara</string>
+    <string name="section_recently_added_plex">Miżjuda reċentement fuq Plex</string>
+    <string name="section_for_you_youtube">Għalik fuq YouTube</string>
+    <string name="section_subscriptions">Abbonamenti</string>
+    <string name="add_app">Żid app</string>
+    <string name="all_apps">L-apps kollha</string>
+    <string name="reorder">Irranġa mill-ġdid</string>
+    <string name="done">Lest</string>
+    <string name="hint_press_to_move">AGĦFAS BIEX IĊĊAQLAQ</string>
+    <string name="hint_press_to_confirm">AGĦFAS BIEX TIKKONFERMA</string>
+    <string name="action_move">Mexxi</string>
+    <string name="action_remove_from_dock">Neħħi minn L-apps tiegħek</string>
+    <string name="add_to_dock_title">Żid ma\' L-apps tiegħek</string>
+    <string name="all_apps_already_added">L-apps kollha installati diġà ġew miżjuda.</string>
+    <string name="close">Agħlaq</string>
+    <string name="settings">Settings</string>
+    <string name="tile_apps">Apps</string>
+    <string name="tile_accounts">Kontijiet</string>
+    <string name="tile_inputs">Inputs</string>
+    <string name="tile_picture">Stampa</string>
+    <string name="tile_network">Netwerk</string>
+    <string name="tile_remotes">Remotes</string>
+    <string name="tile_accessibility">Aċċessibbiltà</string>
+    <string name="tile_screensaver">Screensaver</string>
+    <string name="tile_refresh_album">Aġġorna l-album</string>
+    <string name="plex_link_title">Qabbad server ta\' Plex</string>
+    <string name="plex_getting_code">Qed jinkiseb kodiċi…</string>
+    <string name="plex_link_dialog_title">Qabbad Plex</string>
+    <string name="cancel">Ikkanċella</string>
+    <string name="plex_code_instructions">Fuq il-mowbajl jew il-kompjuter, mur fuq\nplex.tv/link\nu daħħal\n\n%1$s</string>
+    <string name="plex_error_connection">Ma setax jintlaħaq plex.tv. Iċċekkja l-konnessjoni tal-internet tat-TV.</string>
+    <string name="arrange_your_apps">Irranġa l-apps tiegħek</string>
+    <string name="plex_no_server">Mqabbad, iżda l-ebda server ta\' Plex ma wieġeb fuq dan in-netwerk.</string>
+</resources>
