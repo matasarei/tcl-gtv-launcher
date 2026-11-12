@@ -2,6 +2,7 @@ package tv.cleanhome.gtv;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -169,9 +170,8 @@ public class GlobalKeyService extends AccessibilityService {
         try {
             Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
             serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
-            serviceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startService(serviceIntent);
-            return;
+            ComponentName cn = startService(serviceIntent);
+            if (cn != null) return;
         } catch (Exception ignored) {}
 
         // 2. Standard Android TV input picker
