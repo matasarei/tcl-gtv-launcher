@@ -29,7 +29,6 @@ public class GlobalKeyService extends AccessibilityService {
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        Log.i(TAG, "onKeyEvent: action=" + event.getAction() + " code=" + event.getKeyCode());
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             int code = event.getKeyCode();
             if (code == 4077 || code == 176 || code == KeyEvent.KEYCODE_SETTINGS || code == KeyEvent.KEYCODE_MENU) {
