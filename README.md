@@ -1,5 +1,6 @@
 # TCL GTV Launcher
 
+[![CI](https://github.com/matasarei/tcl-gtv-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/matasarei/tcl-gtv-launcher/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20TV%20%7C%20Google%20TV-blue.svg)](https://android.com/tv/)
 [![Tested On](https://img.shields.io/badge/Tested%20On-TCL%2043V6B%20%28RTD2851%29%20%7C%20G03__4K__US%20%7C%20AS50-orange.svg)](#tested-devices)
