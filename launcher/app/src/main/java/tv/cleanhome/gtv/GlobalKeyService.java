@@ -63,7 +63,6 @@ public class GlobalKeyService extends AccessibilityService {
     protected boolean onKeyEvent(KeyEvent event) {
         int code = event.getKeyCode();
         int action = event.getAction();
-        Log.i(TAG, "onKeyEvent: code=" + code + ", action=" + action);
 
         if (action != KeyEvent.ACTION_DOWN || event.getRepeatCount() > 0) {
             return super.onKeyEvent(event);
