@@ -3,7 +3,7 @@
 [![CI](https://github.com/matasarei/tcl-gtv-launcher/actions/workflows/ci.yml/badge.svg)](https://github.com/matasarei/tcl-gtv-launcher/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20TV%20%7C%20Google%20TV-blue.svg)](https://android.com/tv/)
-[![Tested On](https://img.shields.io/badge/Tested%20On-TCL%2043V6B%20%28RTD2851%29%20%7C%20G03__4K__US%20%7C%20AS50-orange.svg)](#tested-devices)
+[![Tested On](https://img.shields.io/badge/Tested%20On-TCL%2043V6B%20%28A11%29%20%7C%20G08%20%28A14%29-orange.svg)](#tested-devices)
 [![Telemetry](https://img.shields.io/badge/Telemetry-Zero%20%2F%20Ad--Free-success.svg)](#network--privacy)
 [![Fork of](https://img.shields.io/badge/Forked%20from-alexkev%2Ftcl--gtv--launcher-lightgrey.svg)](https://github.com/alexkev/tcl-gtv-launcher)
 
@@ -14,14 +14,11 @@ This is a dedicated fork of [alexkev/tcl-gtv-launcher](https://github.com/alexke
 <a id="tested-devices"></a>
 **Tested on:**
 - TCL 43V6B (Realtek RTD2851, Android 11 TV API 30, build GTV93)
+- TCL Smart TV Pro / G08_4K_GB (Mediatek MT5896, Android 14 TV API 34)
 - TCL G03_4K_US (Android 11, build GTV93)
 - TCL Smart TV (Android 12, build AS50)
 
 ![Home: Your apps along the bottom over wallpaper background](docs/home.jpg)
-
-| Continue watching | Recently added on Plex |
-|---|---|
-| ![Your apps with the Continue watching row below](docs/continue-watching.jpg) | ![Recently added on Plex and For you on YouTube rows](docs/plex.jpg) |
 
 ---
 
