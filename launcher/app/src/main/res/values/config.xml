@@ -18,8 +18,8 @@
     <!-- Weather in the top-right corner: a city name or postal code Open-Meteo can find.
          Empty uses the TV's approximate location from its IP address (ipapi.co). -->
     <string name="weather_city"></string>
-    <!-- fahrenheit or celsius -->
-    <string name="temperature_unit">fahrenheit</string>
+    <!-- Temperature unit: "auto" (detected from location / locale), "celsius", or "fahrenheit" -->
+    <string name="temperature_unit">auto</string>
 
     <!-- Continue watching: hide items not touched for this many days (apps leave stale rows behind). -->
     <integer name="continue_max_age_days">30</integer>

@@ -68,6 +68,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1532,10 +1533,40 @@ public class MainActivity extends Activity {
 
     // ---- weather (Open-Meteo, no key) ----
 
+    static boolean isFahrenheitCountry(String country) {
+        if (country == null) return false;
+        country = country.trim().toUpperCase(Locale.US);
+        return country.equals("US") || country.equals("USA")
+                || country.equals("BS") || country.equals("BZ")
+                || country.equals("KY") || country.equals("PW")
+                || country.equals("FM") || country.equals("MH")
+                || country.equals("LR") || country.equals("VI")
+                || country.equals("GU") || country.equals("MP")
+                || country.equals("AS") || country.equals("PR");
+    }
+
+    static String[] resolveTemperatureUnitAndSymbol(String configuredUnit, String country) {
+        if (configuredUnit != null) {
+            configuredUnit = configuredUnit.trim().toLowerCase(Locale.US);
+        } else {
+            configuredUnit = "";
+        }
+        if ("celsius".equals(configuredUnit) || "c".equals(configuredUnit)) {
+            return new String[]{"celsius", "°C"};
+        }
+        if ("fahrenheit".equals(configuredUnit) || "f".equals(configuredUnit)) {
+            return new String[]{"fahrenheit", "°F"};
+        }
+        if (isFahrenheitCountry(country)) {
+            return new String[]{"fahrenheit", "°F"};
+        }
+        return new String[]{"celsius", "°C"};
+    }
+
     void loadWeather() {
         ui.removeCallbacks(weatherTick);
         String city = getString(R.string.weather_city).trim();
-        String unit = getString(R.string.temperature_unit);
+        String configuredUnit = getString(R.string.temperature_unit);
         if (weather.getText().length() == 0) {
             weather.setVisibility(View.GONE);
             findViewById(R.id.weather_divider).setVisibility(View.GONE);
@@ -1544,28 +1575,42 @@ public class MainActivity extends Activity {
             try {
                 SharedPreferences prefs = getSharedPreferences("weather", MODE_PRIVATE);
                 String key = city.isEmpty() ? "ip" : city;
-                boolean stale = city.isEmpty() && System.currentTimeMillis() - prefs.getLong("at", 0) > 86_400_000L;
+                boolean stale = city.isEmpty() && (System.currentTimeMillis() - prefs.getLong("at", 0) > 86_400_000L || !prefs.contains("country"));
                 if (!key.equals(prefs.getString("key", null)) || stale) {
                     String lat, lon;
+                    String country = "";
                     if (city.isEmpty()) {
                         JSONObject here = new JSONObject(get("https://ipapi.co/json/"));
                         lat = here.getString("latitude");
                         lon = here.getString("longitude");
+                        country = here.optString("country_code", "");
                     } else {
                         JSONArray hits = new JSONObject(get("https://geocoding-api.open-meteo.com/v1/search?count=1&name="
                                 + URLEncoder.encode(city, "UTF-8"))).optJSONArray("results");
                         if (hits == null || hits.length() == 0) return;
-                        lat = hits.getJSONObject(0).getString("latitude");
-                        lon = hits.getJSONObject(0).getString("longitude");
+                        JSONObject hit = hits.getJSONObject(0);
+                        lat = hit.getString("latitude");
+                        lon = hit.getString("longitude");
+                        country = hit.optString("country_code", "");
                     }
-                    prefs.edit().putString("key", key).putString("lat", lat).putString("lon", lon)
-                            .putLong("at", System.currentTimeMillis()).apply();
+                    SharedPreferences.Editor edit = prefs.edit().putString("key", key).putString("lat", lat).putString("lon", lon)
+                            .putLong("at", System.currentTimeMillis());
+                    if (!country.isEmpty()) edit.putString("country", country);
+                    edit.apply();
                 }
+                String country = prefs.getString("country", "");
+                if (country.isEmpty()) {
+                    country = Locale.getDefault().getCountry();
+                }
+                String[] unitAndSymbol = resolveTemperatureUnitAndSymbol(configuredUnit, country);
+                String unit = unitAndSymbol[0];
+                String symbol = unitAndSymbol[1];
+
                 JSONObject now = new JSONObject(get("https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,is_day"
                         + "&latitude=" + prefs.getString("lat", "") + "&longitude=" + prefs.getString("lon", "")
                         + "&temperature_unit=" + unit)).getJSONObject("current");
                 String text = sky(now.getInt("weather_code"), now.optInt("is_day", 1) == 1)
-                        + "  " + Math.round(now.getDouble("temperature_2m")) + "°";
+                        + "  " + Math.round(now.getDouble("temperature_2m")) + symbol;
                 ui.post(() -> {
                     weather.setText(text);
                     weather.setVisibility(View.VISIBLE);
