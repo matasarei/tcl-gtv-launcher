@@ -47,11 +47,13 @@ public class GlobalKeyService extends AccessibilityService {
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        if (event.getAction() != KeyEvent.ACTION_DOWN || event.getRepeatCount() > 0) {
+        int code = event.getKeyCode();
+        int action = event.getAction();
+        Log.i(TAG, "onKeyEvent: code=" + code + ", action=" + action);
+
+        if (action != KeyEvent.ACTION_DOWN || event.getRepeatCount() > 0) {
             return super.onKeyEvent(event);
         }
-
-        int code = event.getKeyCode();
 
         if (isSettingsKey(code)) {
             Log.i(TAG, "Intercepted settings key " + code + ", opening QuickSettingsActivity");
@@ -60,7 +62,7 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isProfileKey(code)) {
-            Log.i(TAG, "Intercepted profile key " + code + ", opening accounts");
+            Log.i(TAG, "Intercepted profile key " + code + ", opening settings/accounts");
             openAccounts();
             return true;
         }
@@ -103,7 +105,6 @@ public class GlobalKeyService extends AccessibilityService {
 
     private boolean isSettingsKey(int code) {
         return code == KEYCODE_TCL_SET ||
-                code == KEYCODE_TCL_QUICK_MENU ||
                 code == 176 ||
                 code == KeyEvent.KEYCODE_SETTINGS ||
                 code == KeyEvent.KEYCODE_MENU;
@@ -116,7 +117,9 @@ public class GlobalKeyService extends AccessibilityService {
     private boolean isTvKey(int code) {
         return code == 170 || code == 178 ||
                 code == KeyEvent.KEYCODE_TV ||
-                code == KeyEvent.KEYCODE_TV_INPUT;
+                code == KeyEvent.KEYCODE_TV_INPUT ||
+                code == 4121 || code == 4164 ||
+                (code >= 4503 && code <= 4509);
     }
 
     private boolean isListKey(int code) {
@@ -131,8 +134,7 @@ public class GlobalKeyService extends AccessibilityService {
 
     private void openAccounts() {
         Intent[] intents = new Intent[]{
-                new Intent().setClassName("com.android.tv.settings", "com.google.android.tv.settings.AccountActivity"),
-                new Intent(Settings.ACTION_SYNC_SETTINGS),
+                new Intent(Settings.ACTION_SETTINGS),
                 new Intent(this, QuickSettingsActivity.class)
         };
         for (Intent intent : intents) {
@@ -145,6 +147,16 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openTvInputs() {
+        // 1. Native TCL input sources overlay service (proven to show input selector)
+        try {
+            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
+            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
+            serviceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startService(serviceIntent);
+            return;
+        } catch (Exception ignored) {}
+
+        // 2. Standard Android TV input picker
         Intent[] intents = new Intent[]{
                 new Intent("com.android.tv.action.VIEW_INPUTS"),
                 new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
