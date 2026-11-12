@@ -1,6 +1,7 @@
 package tv.cleanhome.gtv;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -107,7 +108,7 @@ public class QuickSettingsActivity extends Activity {
                 {"Accounts", R.drawable.ic_account, new Intent[]{
                         new Intent(Settings.ACTION_SETTINGS),
                         new Intent(Settings.ACTION_ADD_ACCOUNT)}},
-                {"Inputs", R.drawable.ic_input, new Intent[]{new Intent("com.android.tv.action.VIEW_INPUTS")}},
+                {"Inputs", R.drawable.ic_input, (Runnable) this::openInputs},
                 {"Picture", R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
                 {"Network", R.drawable.ic_ethernet, new Intent[]{
                         new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
@@ -221,6 +222,23 @@ public class QuickSettingsActivity extends Activity {
             }
         }
         dismiss();
+    }
+
+    private void openInputs() {
+        try {
+            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
+            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
+            ComponentName cn = startService(serviceIntent);
+            if (cn != null) return;
+        } catch (Exception ignored) {}
+
+        Intent[] intents = new Intent[]{
+                new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
+        };
+        for (Intent intent : intents) {
+            if (start(intent)) return;
+        }
     }
 
     private boolean start(Intent in) {
