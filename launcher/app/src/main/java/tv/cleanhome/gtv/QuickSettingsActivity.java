@@ -200,7 +200,7 @@ public class QuickSettingsActivity extends Activity {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             int code = event.getKeyCode();
             if (code == 4077 || code == 176 || code == KeyEvent.KEYCODE_SETTINGS || code == KeyEvent.KEYCODE_MENU
-                    || code == 4016 || code == 288 || code == KeyEvent.KEYCODE_PROFILE_SWITCH) {
+                    || code == 4016 || code == 288 || code == 303 /* KEYCODE_PROFILE_SWITCH */) {
                 dismiss();
                 return true;
             }

@@ -19,6 +19,7 @@ public class GlobalKeyService extends AccessibilityService {
     private static final int KEYCODE_TCL_SET = 4077;
     private static final int KEYCODE_TCL_QUICK_MENU = 4020;
     private static final int KEYCODE_TCL_PROFILE = 4016;
+    private static final int KEYCODE_PROFILE_SWITCH = 303; // KeyEvent.KEYCODE_PROFILE_SWITCH (API 29)
     private static final int KEYCODE_TCL_YOUTUBE = 4065;
     private static final int KEYCODE_TCL_NETFLIX = 4062;
     private static final int KEYCODE_TCL_PRIMEVIDEO = 4099;
@@ -130,7 +131,7 @@ public class GlobalKeyService extends AccessibilityService {
     private boolean isProfileKey(int code) {
         return code == KEYCODE_TCL_PROFILE ||
                 code == 288 ||
-                code == KeyEvent.KEYCODE_PROFILE_SWITCH;
+                code == KEYCODE_PROFILE_SWITCH;
     }
 
     private boolean isTvKey(int code) {
