@@ -194,6 +194,7 @@ public class MainActivity extends Activity {
 
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((old, now) -> onFocusMoved(now));
 
+        setupLiveTab();
         selectTab(tabHome);
         tabHome.requestFocus();
         if (checkSelfPermission(READ_TV) != PackageManager.PERMISSION_GRANTED) {
@@ -205,6 +206,7 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
+        setupLiveTab();
         refreshHome();
         buildAppsGrid();
         loadWeather();
@@ -222,6 +224,7 @@ public class MainActivity extends Activity {
     }
 
     @Override public void onRequestPermissionsResult(int code, String[] perms, int[] results) {
+        setupLiveTab();
         refreshHome();
     }
 
@@ -230,6 +233,7 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         exitArrange();
         showQuick(false);
+        setupLiveTab();
         selectTab(tabHome);
         focusSection = -1;
         tabHome.requestFocus();
@@ -317,6 +321,7 @@ public class MainActivity extends Activity {
     void styleTabs() {
         boolean onTabs = inside(getCurrentFocus(), navPill);
         for (TextView t : new TextView[]{tabHome, tabLive, tabApps}) {
+            if (t.getVisibility() != View.VISIBLE) continue;
             boolean focused = t.isFocused(), selected = t == selectedTab && !onTabs;
             t.setBackground(focused ? round(FOCUS, dp(18)) : selected ? round(PILL_SELECTED, dp(18)) : null);
             t.setTextColor(focused ? DARK_TEXT : WHITE);
@@ -339,12 +344,40 @@ public class MainActivity extends Activity {
         });
     }
 
+    void setupLiveTab() {
+        String live = getString(R.string.live_package);
+        if (TextUtils.isEmpty(live) || launchIntent(live) == null) {
+            tabLive.setVisibility(View.GONE);
+            return;
+        }
+        // If mapped to the TV tuner app, only show Live if channels were actually scanned.
+        // Opening an antenna app with 0 channels traps the user on a black "no signal" screen.
+        if ("com.tcl.tv".equals(live) && !hasLiveChannels()) {
+            tabLive.setVisibility(View.GONE);
+            return;
+        }
+        tabLive.setVisibility(View.VISIBLE);
+    }
+
+    boolean hasLiveChannels() {
+        String tuner = tunerInput();
+        if (tuner == null) return false;
+        try (Cursor c = getContentResolver().query(TvContract.buildChannelsUriForInput(tuner),
+                new String[]{TvContract.Channels._ID}, null, null, null)) {
+            return c != null && c.moveToFirst();
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     /** Live opens the TV app on the antenna (tuner) input, not on whatever source it played last. */
     void openLive() {
         String live = getString(R.string.live_package);
+        if (TextUtils.isEmpty(live)) return;
         String tuner = tunerInput();
         Intent app = launchIntent(live);
-        if (tuner != null && app != null) {
+        if (app == null) return;
+        if (tuner != null) {
             Intent i = new Intent(Intent.ACTION_VIEW, TvContract.buildChannelsUriForInput(tuner))
                     .setComponent(app.getComponent())
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
