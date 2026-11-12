@@ -38,21 +38,29 @@ step "Debloat (packages this model doesn't have are reported and skipped)"
 $T/disable.sh kit/debloat.txt
 P --screenshot "shots/$TV_HOST-01-debloated.png"
 
-step "AdGuard Private DNS (undo: settings put global private_dns_mode opportunistic)"
-P "settings put global private_dns_mode hostname; settings put global private_dns_specifier dns.adguard-dns.com"
+if [ -z "${SKIP_DNS:-}" ]; then
+  step "AdGuard Private DNS (undo: settings put global private_dns_mode opportunistic)"
+  P "settings put global private_dns_mode hostname; settings put global private_dns_specifier dns.adguard-dns.com"
+else
+  step "Skipping Private DNS (keeping local network DNS)"
+fi
 
 step "Build and install the launcher"
 (cd launcher && ./gradlew --no-daemon -q assembleRelease -PalbumUrl="$ALBUM")
 P --push launcher/app/build/outputs/apk/release/app-release.apk /data/local/tmp/gtvhome.apk
 P "pm install -r /data/local/tmp/gtvhome.apk; pm grant tv.cleanhome.gtv android.permission.READ_TV_LISTINGS; rm /data/local/tmp/gtvhome.apk"
 
-step "Download, check and install Plezy"
-C=kit/.cache; mkdir -p $C
-[ -f $C/plezy.tar.gz ] || curl -fsSL -o $C/plezy.tar.gz "$PLEZY_URL"
-echo "$PLEZY_SHA  $C/plezy.tar.gz" | shasum -a 256 -c
-tar xzf $C/plezy.tar.gz -C $C plezy.apk
-$T/venv/bin/python kit/push.py $C/plezy.apk /data/local/tmp/plezy.apk
-P "pm install -r /data/local/tmp/plezy.apk; rm /data/local/tmp/plezy.apk"
+if [ -z "${SKIP_PLEZY:-}" ]; then
+  step "Download, check and install Plezy"
+  C=kit/.cache; mkdir -p $C
+  [ -f $C/plezy.tar.gz ] || curl -fsSL -o $C/plezy.tar.gz "$PLEZY_URL"
+  echo "$PLEZY_SHA  $C/plezy.tar.gz" | shasum -a 256 -c
+  tar xzf $C/plezy.tar.gz -C $C plezy.apk
+  $T/venv/bin/python kit/push.py $C/plezy.apk /data/local/tmp/plezy.apk
+  P "pm install -r /data/local/tmp/plezy.apk; rm /data/local/tmp/plezy.apk"
+else
+  step "Skipping Plezy (Plex not in use)"
+fi
 
 step "Make the launcher Home"
 # Android 12 ignores set-home-activity while Google TV's launcher is enabled, so: check the new launcher
@@ -73,6 +81,8 @@ fi
 step "Reboot and confirm"
 P "reboot" >/dev/null 2>&1 || true; sleep 90
 until P "getprop sys.boot_completed" 2>/dev/null | grep -q 1; do sleep 10; done; sleep 15
+P "input keyevent KEYCODE_HOME"
+sleep 2
 P "dumpsys activity activities | grep mFocusedApp"
 P --screenshot "shots/$TV_HOST-02-home.png"
 echo; echo "Done. Finish by hand: README.md, 'After the script'."

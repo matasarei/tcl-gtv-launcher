@@ -105,9 +105,17 @@ public class MainActivity extends Activity {
     LinearLayout homeRows, appsGrid;
     LinearLayout activeSection;
     final Runnable weatherTick = this::loadWeather;
-    final Runnable photoTick = this::nextPhoto;
+    final Runnable photoTick = this::advancePhoto;
     List<String> photoUrls = new ArrayList<>();
     int photoIndex;
+    static final int[] DEFAULT_WALLPAPERS = {
+        R.drawable.wallpaper_1,
+        R.drawable.wallpaper_2,
+        R.drawable.wallpaper_3,
+        R.drawable.wallpaper_4,
+        R.drawable.wallpaper_5
+    };
+    int defaultPhotoIndex = 0;
     boolean resumed, photosDimmed;
 
     // Arrange mode for Your apps, as Google TV's Reorder: OK picks an app up, Left/Right move it, OK drops it.
@@ -208,7 +216,7 @@ public class MainActivity extends Activity {
         buildAppsGrid();
         loadWeather();
         ui.removeCallbacks(photoTick);
-        if (!photoUrls.isEmpty()) ui.postDelayed(photoTick, photoDelay());
+        ui.postDelayed(photoTick, photoDelay());
     }
 
     @Override protected void onPause() {
@@ -1364,11 +1372,42 @@ public class MainActivity extends Activity {
         return new BitmapDrawable(getResources(), b);
     }
 
-    // ---- background photos (a Google Photos shared album) ----
+    // ---- background photos (a Google Photos shared album or built-in pack) ----
+
+    void advancePhoto() {
+        if (!photoUrls.isEmpty()) {
+            nextPhoto();
+        } else {
+            nextDefaultPhoto();
+        }
+    }
+
+    void nextDefaultPhoto() {
+        ui.removeCallbacks(photoTick);
+        if (DEFAULT_WALLPAPERS.length == 0) return;
+        int resId = DEFAULT_WALLPAPERS[defaultPhotoIndex++ % DEFAULT_WALLPAPERS.length];
+        io.execute(() -> {
+            Bitmap b = BitmapFactory.decodeResource(getResources(), resId);
+            ui.post(() -> {
+                if (b != null) {
+                    ImageView in = currentPhoto == photoA ? photoB : photoA;
+                    ImageView out = currentPhoto;
+                    currentPhoto = in;
+                    in.setImageBitmap(b);
+                    in.animate().alpha(photoLevel()).setDuration(1500).start();
+                    if (out != null) out.animate().alpha(0f).setDuration(1500).start();
+                }
+                if (resumed) ui.postDelayed(photoTick, photoDelay());
+            });
+        });
+    }
 
     void loadPhotos() {
         String album = getString(R.string.photos_album_url).trim();
-        if (album.isEmpty()) return;
+        if (album.isEmpty()) {
+            nextDefaultPhoto();
+            return;
+        }
         ui.removeCallbacks(photosRetry);
         io.execute(() -> {
             try {
