@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
 public class GlobalKeyService extends AccessibilityService {
@@ -28,9 +29,20 @@ public class GlobalKeyService extends AccessibilityService {
     private static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
     private static final String PKG_NETFLIX = "com.netflix.ninja";
     private static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
+    private static final String PKG_TV = "com.tcl.tv";
+    private static final String PKG_TV_INPUT = "com.tcl.tvinput";
+
+    private volatile String foregroundPackage = null;
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {}
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        if (event != null && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            CharSequence pkg = event.getPackageName();
+            if (pkg != null) {
+                foregroundPackage = pkg.toString();
+            }
+        }
+    }
 
     @Override
     public void onInterrupt() {}
@@ -41,6 +53,7 @@ public class GlobalKeyService extends AccessibilityService {
         AccessibilityServiceInfo info = getServiceInfo();
         if (info == null) info = new AccessibilityServiceInfo();
         info.feedbackType = AccessibilityServiceInfo.FEEDBACK_GENERIC;
+        info.eventTypes |= AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
         info.flags |= AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS;
         setServiceInfo(info);
         Log.i(TAG, "GlobalKeyService connected: flags=" + info.flags);
@@ -75,8 +88,12 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isListKey(code)) {
-            Log.i(TAG, "Intercepted list key " + code + ", opening app list");
-            openList();
+            if (isTvForeground()) {
+                Log.i(TAG, "TV app is foreground; delegating list key " + code + " to native TV channel list");
+                return super.onKeyEvent(event);
+            }
+            Log.i(TAG, "Intercepted list key " + code + " outside TV, opening Live TV");
+            openLiveTv();
             return true;
         }
 
@@ -172,16 +189,30 @@ public class GlobalKeyService extends AccessibilityService {
         }
     }
 
-    private void openList() {
-        Intent[] intents = new Intent[]{
-                new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
-                new Intent(this, QuickSettingsActivity.class)
-        };
-        for (Intent intent : intents) {
+    private boolean isTvForeground() {
+        if (PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage)) {
+            return true;
+        }
+        try {
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                CharSequence pkg = root.getPackageName();
+                root.recycle();
+                if (pkg != null) {
+                    foregroundPackage = pkg.toString();
+                    return PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage);
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
+    private void openLiveTv() {
+        if (!launchPackage(PKG_TV)) {
             try {
+                Intent intent = new Intent().setClassName(PKG_TV, "com.tcl.tv.TVActivity");
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                return;
             } catch (Exception ignored) {}
         }
     }
