@@ -1,9 +1,12 @@
 package tv.cleanhome.gtv;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +30,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -97,8 +101,10 @@ public class MainActivity extends Activity {
 
     PackageManager pm;
     Typeface regular, medium;
-    TextView tabHome, tabLive, tabApps, selectedTab, weather, tooltip;
-    View btnScreensaver, btnQuick, topBar, navPill, content, quickPanel, allSettings;
+    TextView weather, tooltip;
+    View selectedTab;
+    ImageView tabHome, tabApps, btnScreensaver, btnQuick;
+    View topBar, navPill, content, quickPanel, allSettings;
     ImageView photoA, photoB, currentPhoto;
     CenterScroll homeScroll;
     ScrollView appsScroll;
@@ -110,6 +116,11 @@ public class MainActivity extends Activity {
     int photoIndex;
     int defaultPhotoIndex = 0;
     boolean resumed, photosDimmed;
+    private final BroadcastReceiver refreshReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            loadPhotos();
+        }
+    };
 
     // Arrange mode for Your apps, as Google TV's Reorder: OK picks an app up, Left/Right move it, OK drops it.
     LinearLayout arrangeRow;
@@ -151,7 +162,6 @@ public class MainActivity extends Activity {
         medium = font("/system/fonts/Google_Sans-500-100_0-0_0.ttf", Typeface.BOLD);
 
         tabHome = findViewById(R.id.tab_home);
-        tabLive = findViewById(R.id.tab_live);
         tabApps = findViewById(R.id.tab_apps);
         btnScreensaver = findViewById(R.id.btn_screensaver);
         btnQuick = findViewById(R.id.btn_quick);
@@ -170,8 +180,7 @@ public class MainActivity extends Activity {
         appsGrid = findViewById(R.id.apps_grid);
 
         applyFont(findViewById(R.id.root));
-        // Google TV sets its tabs and the button labels in Google Sans Medium, the rest in Regular.
-        for (TextView t : new TextView[]{tabHome, tabLive, tabApps, tooltip}) t.setTypeface(medium);
+        tooltip.setTypeface(medium);
         navPill.setBackground(round(PILL, dp(22)));
         findViewById(R.id.action_pill).setBackground(round(PILL, dp(22)));
         quickPanel.setBackground(round(PANEL, dp(20)));
@@ -179,16 +188,16 @@ public class MainActivity extends Activity {
                 new int[]{0xB30D1013, 0x000D1013, 0x400D1013, 0xE60D1013});
         findViewById(R.id.scrim).setBackground(scrim);
 
-        // Home and Apps switch as focus lands on them, like Google TV; Live opens the antenna on OK.
+        // Home and Apps switch as focus lands on them, like Google TV.
         tabHome.setOnFocusChangeListener((v, has) -> { if (has) selectTab(tabHome); });
         tabApps.setOnFocusChangeListener((v, has) -> { if (has) selectTab(tabApps); });
-        tabLive.setOnClickListener(v -> openLive());
         tabHome.setOnClickListener(v -> focusFirstApp());
-        // The ends of the bar don't fall through to the content below.
         tabHome.setNextFocusLeftId(R.id.tab_home);
+        tabApps.setNextFocusRightId(R.id.btn_screensaver);
+        btnScreensaver.setNextFocusLeftId(R.id.tab_apps);
         btnQuick.setNextFocusRightId(R.id.btn_quick);
         btnScreensaver.setOnClickListener(v -> startScreensaver());
-        btnQuick.setOnClickListener(v -> showQuick(true));
+        btnQuick.setOnClickListener(v -> startActivity(new Intent(this, QuickSettingsActivity.class)));
         buildQuickPanel();
         appsScroll.setOnScrollChangeListener((v, x, y, ox, oy) -> hideRowsUnderBar());
 
@@ -200,6 +209,18 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{READ_TV}, 1);
         }
         loadPhotos();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM), Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                registerRefreshReceiverLegacy();
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private void registerRefreshReceiverLegacy() {
+        registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM));
     }
 
     @Override protected void onResume() {
@@ -248,10 +269,10 @@ public class MainActivity extends Activity {
     void onFocusMoved(View now) {
         styleTabs();
         if (arrangeRow != null) updateHint(now);
-        boolean action = now == btnScreensaver || now == btnQuick;
+        boolean action = now == tabHome || now == tabApps || now == btnScreensaver || now == btnQuick;
         if (action) showTooltip(now);
         else tooltip.setVisibility(View.INVISIBLE);
-        if (quickPanel.getVisibility() != View.VISIBLE) content.setAlpha(action ? 0.35f : 1f);
+        if (quickPanel.getVisibility() != View.VISIBLE) content.setAlpha(now == btnScreensaver || now == btnQuick ? 0.35f : 1f);
         if (now == null || selectedTab != tabHome) return;
         if (inside(now, homeRows)) {
             LinearLayout section = sectionOf(now);
@@ -305,7 +326,7 @@ public class MainActivity extends Activity {
 
     // ---- top bar ----
 
-    void selectTab(TextView tab) {
+    void selectTab(View tab) {
         selectedTab = tab;
         homeScroll.setVisibility(tab == tabApps ? View.GONE : View.VISIBLE);
         appsScroll.setVisibility(tab == tabApps ? View.VISIBLE : View.GONE);
@@ -316,14 +337,14 @@ public class MainActivity extends Activity {
     /** Only the focused tab is lit while focus is on the tabs; the current page shows grey once focus leaves them. */
     void styleTabs() {
         boolean onTabs = inside(getCurrentFocus(), navPill);
-        for (TextView t : new TextView[]{tabHome, tabLive, tabApps}) {
+        for (ImageView t : new ImageView[]{tabHome, tabApps}) {
             boolean focused = t.isFocused(), selected = t == selectedTab && !onTabs;
-            t.setBackground(focused ? round(FOCUS, dp(18)) : selected ? round(PILL_SELECTED, dp(18)) : null);
-            t.setTextColor(focused ? DARK_TEXT : WHITE);
+            t.setBackground(focused ? oval(FOCUS) : selected ? oval(PILL_SELECTED) : null);
+            t.setImageTintList(ColorStateList.valueOf(focused ? DARK_TEXT : WHITE));
         }
-        for (View b : new View[]{btnScreensaver, btnQuick}) {
+        for (ImageView b : new ImageView[]{btnScreensaver, btnQuick}) {
             b.setBackground(b.isFocused() ? oval(FOCUS) : null);
-            ((ImageView) b).setImageTintList(ColorStateList.valueOf(b.isFocused() ? DARK_TEXT : WHITE));
+            b.setImageTintList(ColorStateList.valueOf(b.isFocused() ? DARK_TEXT : WHITE));
         }
     }
 
@@ -337,29 +358,6 @@ public class MainActivity extends Activity {
             tooltip.setY(at[1] + anchor.getHeight() + dp(14));
             if (anchor.isFocused()) tooltip.setVisibility(View.VISIBLE);
         });
-    }
-
-    /** Live opens the TV app on the antenna (tuner) input, not on whatever source it played last. */
-    void openLive() {
-        String live = getString(R.string.live_package);
-        String tuner = tunerInput();
-        Intent app = launchIntent(live);
-        if (tuner != null && app != null) {
-            Intent i = new Intent(Intent.ACTION_VIEW, TvContract.buildChannelsUriForInput(tuner))
-                    .setComponent(app.getComponent())
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            if (start(i)) return;
-        }
-        launchPackage(live);
-    }
-
-    String tunerInput() {
-        TvInputManager tim = getSystemService(TvInputManager.class);
-        if (tim == null) return null;
-        for (TvInputInfo info : tim.getTvInputList()) {
-            if (info.getType() == TvInputInfo.TYPE_TUNER) return info.getId();
-        }
-        return null;
     }
 
     void startScreensaver() {
@@ -383,13 +381,24 @@ public class MainActivity extends Activity {
 
         LinearLayout tiles = findViewById(R.id.quick_tiles);
         Object[][] entries = {
-                {"Screensaver", R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
-                {"Refresh album", R.drawable.ic_refresh, (Runnable) this::loadPhotos},
+                {"Apps", R.drawable.ic_apps, new Intent[]{
+                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
+                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
+                        new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
                 {"Inputs", R.drawable.ic_input, new Intent[]{new Intent("com.android.tv.action.VIEW_INPUTS")}},
                 {"Picture", R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
-                {"Ethernet", R.drawable.ic_ethernet, new Intent[]{new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
+                {"Network", R.drawable.ic_ethernet, new Intent[]{
+                        new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
                         new Intent(Settings.ACTION_WIRELESS_SETTINGS)}},
-                {"Accessibility", R.drawable.ic_accessibility, new Intent[]{new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
+                {"Remotes", R.drawable.ic_bluetooth, new Intent[]{
+                        new Intent().setClassName("com.android.tv.settings", "com.tcl.android.tv.settings.accessories.AccessoriesActivity"),
+                        new Intent("android.settings.BLUETOOTH_SETTINGS")}},
+                {"Accessibility", R.drawable.ic_accessibility, new Intent[]{
+                        new Intent("android.settings.ACCESSIBILITY_TV_OEM_LINK"),
+                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
+                        new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
+                {"Screensaver", R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
+                {"Refresh album", R.drawable.ic_refresh, (Runnable) this::loadPhotos},
         };
         LinearLayout row = null;
         for (int i = 0; i < entries.length; i++) {
@@ -445,7 +454,10 @@ public class MainActivity extends Activity {
                     .setInterpolator(new DecelerateInterpolator(2f)).start();
             fade(content, 0.3f);
             fade(topBar, 0.3f);
-            allSettings.requestFocus();
+            LinearLayout tiles = findViewById(R.id.quick_tiles);
+            View firstTile = tiles.getChildCount() > 0 && ((ViewGroup) tiles.getChildAt(0)).getChildCount() > 0
+                    ? ((ViewGroup) tiles.getChildAt(0)).getChildAt(0) : allSettings;
+            firstTile.requestFocus();
         } else {
             quickPanel.animate().translationX(away).alpha(0f).setDuration(200)
                     .setInterpolator(new DecelerateInterpolator())
@@ -970,8 +982,21 @@ public class MainActivity extends Activity {
     }
 
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
+        int k = e.getKeyCode();
+        // 4077 is TCL's proprietary OEM keycode for the remote's physical Settings button.
+        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                startActivity(new Intent(this, QuickSettingsActivity.class));
+            }
+            return true;
+        }
+        if (k == KeyEvent.KEYCODE_TV_INPUT) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                start(new Intent("com.android.tv.action.VIEW_INPUTS"));
+            }
+            return true;
+        }
         if (arrangeRow != null) {
-            int k = e.getKeyCode();
             boolean down = e.getAction() == KeyEvent.ACTION_DOWN;
             boolean ok = k == KeyEvent.KEYCODE_DPAD_CENTER || k == KeyEvent.KEYCODE_ENTER;
             // The OK that opened arrange mode is released inside it: only a press made here counts.
@@ -1641,6 +1666,9 @@ public class MainActivity extends Activity {
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(refreshReceiver);
+        } catch (Throwable ignored) {}
         io.shutdownNow();
     }
 }

@@ -29,6 +29,6 @@
     <string name="subscriptions_package">com.google.android.youtube.tv</string>
     <string name="subscriptions_channel">Subscriptions</string>
 
-    <!-- Live button: the TV app that plays the antenna tuner. -->
+    <!-- Live button: the TV app that plays the antenna tuner or a live TV app. Empty to hide the tab. -->
     <string name="live_package">com.tcl.tv</string>
 </resources>
