@@ -37,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -384,6 +385,12 @@ public class MainActivity extends Activity {
     }
 
     void openInputs() {
+        long now = SystemClock.uptimeMillis();
+        if (now - GlobalKeyService.lastInputOpenedTime < 1000) {
+            return;
+        }
+        GlobalKeyService.lastInputOpenedTime = now;
+
         // 1. Native TCL input sources overlay service (same as TV button)
         try {
             Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
@@ -395,11 +402,39 @@ public class MainActivity extends Activity {
         // 2. Standard Android TV input picker fallback
         Intent[] intents = new Intent[]{
                 new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent("com.tcl.suspension.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
                 new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
         };
         for (Intent intent : intents) {
             if (start(intent)) return;
         }
+    }
+
+    void openYouTube() {
+        String[] youtubePackages = {
+                "com.google.android.youtube.tv",
+                "com.liskovsoft.videomanager",
+                "com.liskovsoft.smarttubetv.beta",
+                "com.liskovsoft.smarttubetv"
+        };
+        for (String pkg : youtubePackages) {
+            Intent intent = pm.getLeanbackLaunchIntentForPackage(pkg);
+            if (intent == null) intent = pm.getLaunchIntentForPackage(pkg);
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                if (start(intent)) return;
+            }
+        }
+        try {
+            getPackageManager().setApplicationEnabledSetting(
+                    "com.google.android.youtube.tv",
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    0);
+            Intent intent = pm.getLeanbackLaunchIntentForPackage("com.google.android.youtube.tv");
+            if (intent == null) intent = pm.getLaunchIntentForPackage("com.google.android.youtube.tv");
+            if (intent != null && start(intent)) return;
+        } catch (Exception ignored) {}
     }
 
     void openLiveTv() {
@@ -1165,8 +1200,15 @@ public class MainActivity extends Activity {
             }
             return true;
         }
-        // List key: 190 (TCL RC833 List button), 4090, 4126
-        if (k == 190 || k == 4090 || k == 4126 || k == KeyEvent.KEYCODE_BUTTON_3) {
+        // YouTube key: 190 (TCL RC833 YouTube button), 4065, KEYCODE_BUTTON_3
+        if (k == 190 || k == 4065 || k == KeyEvent.KEYCODE_BUTTON_3) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openYouTube();
+            }
+            return true;
+        }
+        // List key: 4090, 4126
+        if (k == 4090 || k == 4126) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 openLiveTv();
             }

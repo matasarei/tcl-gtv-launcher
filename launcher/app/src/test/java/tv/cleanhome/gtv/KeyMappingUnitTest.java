@@ -51,12 +51,22 @@ public class KeyMappingUnitTest {
     }
 
     @Test
+    public void testYouTubeKeyCodes() {
+        // YouTube button on RC833: 190 (KEYCODE_BUTTON_3), 4065 (KEYCODE_TCL_YOUTUBE)
+        int[] ytCodes = {190, 4065, KeyEvent.KEYCODE_BUTTON_3};
+        for (int code : ytCodes) {
+            assertTrue("YouTube code should be accepted: " + code,
+                    code == 190 || code == 4065 || code == KeyEvent.KEYCODE_BUTTON_3);
+        }
+    }
+
+    @Test
     public void testListKeyCodes() {
-        // List button on RC833: 190 (KEYCODE_BUTTON_3), 4090, 4126
-        int[] listCodes = {190, 4090, 4126, KeyEvent.KEYCODE_BUTTON_3};
+        // List button: 4090, 4126
+        int[] listCodes = {4090, 4126};
         for (int code : listCodes) {
             assertTrue("List code should be accepted: " + code,
-                    code == 190 || code == 4090 || code == 4126 || code == KeyEvent.KEYCODE_BUTTON_3);
+                    code == 4090 || code == 4126);
         }
     }
 }

@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -35,6 +36,8 @@ public class GlobalKeyService extends AccessibilityService {
     private static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
     private static final String PKG_TV = "com.tcl.tv";
     private static final String PKG_TV_INPUT = "com.tcl.tvinput";
+
+    public static volatile long lastInputOpenedTime = 0;
 
     private volatile String foregroundPackage = null;
 
@@ -112,9 +115,10 @@ public class GlobalKeyService extends AccessibilityService {
             return true;
         }
 
-        if (code == KEYCODE_TCL_YOUTUBE) {
+        if (isYouTubeKey(code)) {
             Log.i(TAG, "Intercepted YouTube key " + code);
-            if (launchPackage(PKG_YOUTUBE)) return true;
+            openYouTube();
+            return true;
         }
 
         if (code == KEYCODE_TCL_NETFLIX) {
@@ -172,11 +176,15 @@ public class GlobalKeyService extends AccessibilityService {
         return code == 178 || code == KeyEvent.KEYCODE_TV_INPUT;
     }
 
-    private boolean isListKey(int code) {
-        return code == KEYCODE_TCL_LIST ||
-                code == KEYCODE_TCL_RECORD_LIST ||
+    private boolean isYouTubeKey(int code) {
+        return code == KEYCODE_TCL_YOUTUBE ||
                 code == KEYCODE_BUTTON_3 ||
                 code == KeyEvent.KEYCODE_BUTTON_3;
+    }
+
+    private boolean isListKey(int code) {
+        return code == KEYCODE_TCL_LIST ||
+                code == KEYCODE_TCL_RECORD_LIST;
     }
 
     private void openQuickSettings() {
@@ -204,6 +212,13 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openTvInputs() {
+        long now = SystemClock.uptimeMillis();
+        if (now - lastInputOpenedTime < 1000) {
+            Log.i(TAG, "Debouncing TV inputs launch");
+            return;
+        }
+        lastInputOpenedTime = now;
+
         // 1. Native TCL input sources overlay service (proven to show input selector)
         try {
             Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
@@ -215,6 +230,8 @@ public class GlobalKeyService extends AccessibilityService {
         // 2. Standard Android TV input picker
         Intent[] intents = new Intent[]{
                 new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent("com.tcl.suspension.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
                 new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
         };
         for (Intent intent : intents) {
@@ -224,6 +241,25 @@ public class GlobalKeyService extends AccessibilityService {
                 return;
             } catch (Exception ignored) {}
         }
+    }
+
+    private void openYouTube() {
+        String[] youtubePackages = {
+                PKG_YOUTUBE,
+                "com.liskovsoft.videomanager",
+                "com.liskovsoft.smarttubetv.beta",
+                "com.liskovsoft.smarttubetv"
+        };
+        for (String pkg : youtubePackages) {
+            if (launchPackage(pkg)) return;
+        }
+        try {
+            getPackageManager().setApplicationEnabledSetting(
+                    PKG_YOUTUBE,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    0);
+            if (launchPackage(PKG_YOUTUBE)) return;
+        } catch (Exception ignored) {}
     }
 
     private boolean isTvForeground() {
