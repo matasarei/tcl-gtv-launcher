@@ -83,9 +83,10 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp">
 
-            <TextView android:id="@+id/tab_home" style="@style/Tab" android:text="Home" />
-            <TextView android:id="@+id/tab_live" style="@style/Tab" android:text="Live" />
-            <TextView android:id="@+id/tab_apps" style="@style/Tab" android:text="Apps" />
+            <ImageView android:id="@+id/tab_home" style="@style/PillIcon"
+                android:contentDescription="Home" android:src="@drawable/ic_home" />
+            <ImageView android:id="@+id/tab_apps" style="@style/PillIcon"
+                android:contentDescription="Apps" android:src="@drawable/ic_apps" />
         </LinearLayout>
 
         <LinearLayout

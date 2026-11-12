@@ -50,6 +50,11 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- TCL remote settings button -->
+            <intent-filter>
+                <action android:name="com.tcl.dashboard.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>
