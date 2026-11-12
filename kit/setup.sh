@@ -40,21 +40,26 @@ step "Debloat (packages this model doesn't have are reported and skipped)"
 $T/disable.sh kit/debloat.txt
 P --screenshot "shots/$TV_HOST-01-debloated.png"
 
-if [ -z "${SKIP_DNS:-}" ]; then
+if [ -n "${ADGUARD_DNS:-}" ] && [ -z "${SKIP_DNS:-}" ]; then
   step "AdGuard Private DNS (undo: settings put global private_dns_mode opportunistic)"
   P "settings put global private_dns_mode hostname; settings put global private_dns_specifier dns.adguard-dns.com"
 else
-  step "Skipping Private DNS (keeping local network DNS)"
+  step "Skipping Private DNS (keeping local network DNS; set ADGUARD_DNS=1 to enable)"
 fi
 
-step "Download and unpack default wallpaper pack"
-C=kit/.cache; mkdir -p "$C"
-WDIR=launcher/app/src/main/res/drawable-nodpi
-mkdir -p "$WDIR"
-if [ ! -f "$WDIR/wallpaper_1.jpg" ]; then
-  [ -f "$C/wallpapers-1080p.tar.gz" ] || curl -fsSL -o "$C/wallpapers-1080p.tar.gz" "$WALLPAPERS_URL"
-  echo "$WALLPAPERS_SHA  $C/wallpapers-1080p.tar.gz" | shasum -a 256 -c
-  tar xzf "$C/wallpapers-1080p.tar.gz" -C "$WDIR"
+if [ -n "${WALLPAPERS:-}" ]; then
+  step "Download and unpack default wallpaper pack (${WALLPAPERS})"
+  C=kit/.cache; mkdir -p "$C"
+  WDIR=launcher/app/src/main/res/drawable-nodpi
+  mkdir -p "$WDIR"
+  if [ ! -f "$WDIR/wallpaper_1.jpg" ]; then
+    [ -f "$C/wallpapers-1080p.tar.gz" ] || curl -fsSL -o "$C/wallpapers-1080p.tar.gz" "$WALLPAPERS_URL"
+    echo "$WALLPAPERS_SHA  $C/wallpapers-1080p.tar.gz" | shasum -a 256 -c
+    tar xzf "$C/wallpapers-1080p.tar.gz" -C "$WDIR"
+  fi
+else
+  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 or WALLPAPERS=1080p to include)"
+  rm -rf launcher/app/src/main/res/drawable-nodpi
 fi
 
 step "Build and install the launcher"
@@ -62,7 +67,7 @@ step "Build and install the launcher"
 P --push launcher/app/build/outputs/apk/release/app-release.apk /data/local/tmp/gtvhome.apk
 P "pm install -r /data/local/tmp/gtvhome.apk; pm grant tv.cleanhome.gtv android.permission.READ_TV_LISTINGS; rm /data/local/tmp/gtvhome.apk"
 
-if [ -z "${SKIP_PLEZY:-}" ]; then
+if [ -n "${PLEZY:-}" ] || [ -n "${INSTALL_PLEZY:-}" ]; then
   step "Download, check and install Plezy"
   C=kit/.cache; mkdir -p $C
   [ -f $C/plezy.tar.gz ] || curl -fsSL -o $C/plezy.tar.gz "$PLEZY_URL"
@@ -71,7 +76,7 @@ if [ -z "${SKIP_PLEZY:-}" ]; then
   $T/venv/bin/python kit/push.py $C/plezy.apk /data/local/tmp/plezy.apk
   P "pm install -r /data/local/tmp/plezy.apk; rm /data/local/tmp/plezy.apk"
 else
-  step "Skipping Plezy (Plex not in use)"
+  step "Skipping Plezy (set PLEZY=1 to install)"
 fi
 
 step "Make the launcher Home"

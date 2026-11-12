@@ -108,13 +108,6 @@ public class MainActivity extends Activity {
     final Runnable photoTick = this::advancePhoto;
     List<String> photoUrls = new ArrayList<>();
     int photoIndex;
-    static final int[] DEFAULT_WALLPAPERS = {
-        R.drawable.wallpaper_1,
-        R.drawable.wallpaper_2,
-        R.drawable.wallpaper_3,
-        R.drawable.wallpaper_4,
-        R.drawable.wallpaper_5
-    };
     int defaultPhotoIndex = 0;
     boolean resumed, photosDimmed;
 
@@ -1382,10 +1375,21 @@ public class MainActivity extends Activity {
         }
     }
 
+    List<Integer> defaultWallpapers() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            int id = getResources().getIdentifier("wallpaper_" + i, "drawable", getPackageName());
+            if (id != 0) list.add(id);
+            else if (i > 5) break;
+        }
+        return list;
+    }
+
     void nextDefaultPhoto() {
         ui.removeCallbacks(photoTick);
-        if (DEFAULT_WALLPAPERS.length == 0) return;
-        int resId = DEFAULT_WALLPAPERS[defaultPhotoIndex++ % DEFAULT_WALLPAPERS.length];
+        List<Integer> wallpapers = defaultWallpapers();
+        if (wallpapers.isEmpty()) return;
+        int resId = wallpapers.get(defaultPhotoIndex++ % wallpapers.size());
         io.execute(() -> {
             BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inPreferredConfig = Bitmap.Config.RGB_565;
