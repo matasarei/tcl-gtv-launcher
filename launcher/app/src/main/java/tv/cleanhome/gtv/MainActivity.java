@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -103,7 +104,7 @@ public class MainActivity extends Activity {
     Typeface regular, medium;
     TextView weather, tooltip;
     View selectedTab;
-    ImageView tabHome, tabApps, btnScreensaver, btnQuick;
+    ImageView tabHome, tabApps, btnInputs, btnScreensaver, btnQuick;
     View topBar, navPill, content, quickPanel, allSettings;
     ImageView photoA, photoB, currentPhoto;
     CenterScroll homeScroll;
@@ -163,6 +164,7 @@ public class MainActivity extends Activity {
 
         tabHome = findViewById(R.id.tab_home);
         tabApps = findViewById(R.id.tab_apps);
+        btnInputs = findViewById(R.id.btn_inputs);
         btnScreensaver = findViewById(R.id.btn_screensaver);
         btnQuick = findViewById(R.id.btn_quick);
         weather = findViewById(R.id.weather);
@@ -193,9 +195,14 @@ public class MainActivity extends Activity {
         tabApps.setOnFocusChangeListener((v, has) -> { if (has) selectTab(tabApps); });
         tabHome.setOnClickListener(v -> focusFirstApp());
         tabHome.setNextFocusLeftId(R.id.tab_home);
-        tabApps.setNextFocusRightId(R.id.btn_screensaver);
-        btnScreensaver.setNextFocusLeftId(R.id.tab_apps);
+        tabApps.setNextFocusRightId(R.id.btn_inputs);
+        btnInputs.setNextFocusLeftId(R.id.tab_apps);
+        btnInputs.setNextFocusRightId(R.id.btn_screensaver);
+        btnScreensaver.setNextFocusLeftId(R.id.btn_inputs);
+        btnScreensaver.setNextFocusRightId(R.id.btn_quick);
+        btnQuick.setNextFocusLeftId(R.id.btn_screensaver);
         btnQuick.setNextFocusRightId(R.id.btn_quick);
+        btnInputs.setOnClickListener(v -> openInputs());
         btnScreensaver.setOnClickListener(v -> startScreensaver());
         btnQuick.setOnClickListener(v -> startActivity(new Intent(this, QuickSettingsActivity.class)));
         buildQuickPanel();
@@ -269,10 +276,10 @@ public class MainActivity extends Activity {
     void onFocusMoved(View now) {
         styleTabs();
         if (arrangeRow != null) updateHint(now);
-        boolean action = now == tabHome || now == tabApps || now == btnScreensaver || now == btnQuick;
+        boolean action = now == tabHome || now == tabApps || now == btnInputs || now == btnScreensaver || now == btnQuick;
         if (action) showTooltip(now);
         else tooltip.setVisibility(View.INVISIBLE);
-        if (quickPanel.getVisibility() != View.VISIBLE) content.setAlpha(now == btnScreensaver || now == btnQuick ? 0.35f : 1f);
+        if (quickPanel.getVisibility() != View.VISIBLE) content.setAlpha(now == btnInputs || now == btnScreensaver || now == btnQuick ? 0.35f : 1f);
         if (now == null || selectedTab != tabHome) return;
         if (inside(now, homeRows)) {
             LinearLayout section = sectionOf(now);
@@ -342,7 +349,7 @@ public class MainActivity extends Activity {
             t.setBackground(focused ? oval(FOCUS) : selected ? oval(PILL_SELECTED) : null);
             t.setImageTintList(ColorStateList.valueOf(focused ? DARK_TEXT : WHITE));
         }
-        for (ImageView b : new ImageView[]{btnScreensaver, btnQuick}) {
+        for (ImageView b : new ImageView[]{btnInputs, btnScreensaver, btnQuick}) {
             b.setBackground(b.isFocused() ? oval(FOCUS) : null);
             b.setImageTintList(ColorStateList.valueOf(b.isFocused() ? DARK_TEXT : WHITE));
         }
@@ -358,6 +365,25 @@ public class MainActivity extends Activity {
             tooltip.setY(at[1] + anchor.getHeight() + dp(14));
             if (anchor.isFocused()) tooltip.setVisibility(View.VISIBLE);
         });
+    }
+
+    void openInputs() {
+        // 1. Native TCL input sources overlay service (same as TV button)
+        try {
+            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
+            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
+            ComponentName cn = startService(serviceIntent);
+            if (cn != null) return;
+        } catch (Exception ignored) {}
+
+        // 2. Standard Android TV input picker fallback
+        Intent[] intents = new Intent[]{
+                new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
+        };
+        for (Intent intent : intents) {
+            if (start(intent)) return;
+        }
     }
 
     void startScreensaver() {

@@ -99,6 +99,8 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp">
 
+            <ImageView android:id="@+id/btn_inputs" style="@style/PillIcon"
+                android:contentDescription="Inputs" android:src="@drawable/ic_input" />
             <ImageView android:id="@+id/btn_screensaver" style="@style/PillIcon"
                 android:contentDescription="Screensaver" android:src="@drawable/ic_frame" />
             <ImageView android:id="@+id/btn_quick" style="@style/PillIcon"
