@@ -46,30 +46,22 @@ else
 fi
 
 if [ -n "${WALLPAPERS:-}" ]; then
-  step "Download and cache wallpapers on the go (${WALLPAPERS})"
-  C=kit/.cache/wallpapers; mkdir -p "$C"
+  step "Prepare wallpapers from submodule (${WALLPAPERS})"
+  [ -d wallpapers/1080p ] || git submodule update --init wallpapers
   WDIR=launcher/app/src/main/res/drawable-nodpi
   mkdir -p "$WDIR"
-  URLS=(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moraine_Lake_17092005.jpg/1920px-Moraine_Lake_17092005.jpg"
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/1_pano_cuiping_yangshuo_2016.jpg/1920px-1_pano_cuiping_yangshuo_2016.jpg"
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/2015_Ribblehead_Viaduct_1.jpg/1920px-2015_Ribblehead_Viaduct_1.jpg"
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&h=1080&fit=crop"
-    "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&h=1080&fit=crop"
-  )
-  i=1
-  for url in "${URLS[@]}"; do
-    dest="$C/wallpaper_${i}.jpg"
-    if [ ! -f "$dest" ]; then
-      echo "Downloading wallpaper $i on the go..."
-      curl -fsSL -A "Mozilla/5.0" -o "$dest" "$url"
-      which sips >/dev/null 2>&1 && sips -s format jpeg -s formatOptions 70 "$dest" >/dev/null 2>&1 || true
-    fi
-    cp "$dest" "$WDIR/wallpaper_${i}.jpg"
-    i=$((i+1))
-  done
+  case "$WALLPAPERS" in
+    4k|4K)
+      SRC_DIR=wallpapers/4k
+      [ -d "$SRC_DIR" ] || SRC_DIR=wallpapers/1080p
+      ;;
+    *)
+      SRC_DIR=wallpapers/1080p
+      ;;
+  esac
+  cp "$SRC_DIR"/wallpaper_*.jpg "$WDIR/"
 else
-  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 to download and include)"
+  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 to include submodule wallpapers)"
   rm -rf launcher/app/src/main/res/drawable-nodpi
 fi
 
