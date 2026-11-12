@@ -115,8 +115,12 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private boolean isTvKey(int code) {
-        return code == 170 || code == 178 ||
+        return code == 4001 ||
+                code == 170 ||
+                code == 172 ||
+                code == 178 ||
                 code == KeyEvent.KEYCODE_TV ||
+                code == KeyEvent.KEYCODE_GUIDE ||
                 code == KeyEvent.KEYCODE_TV_INPUT ||
                 code == 4121 || code == 4164 ||
                 (code >= 4503 && code <= 4509);
