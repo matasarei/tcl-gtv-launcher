@@ -82,7 +82,13 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isTvKey(code)) {
-            Log.i(TAG, "Intercepted TV key " + code + ", opening TV inputs");
+            Log.i(TAG, "Intercepted TV key " + code + ", opening Live TV app");
+            openLiveTv();
+            return true;
+        }
+
+        if (isInputKey(code)) {
+            Log.i(TAG, "Intercepted input key " + code + ", opening TV inputs");
             openTvInputs();
             return true;
         }
@@ -137,13 +143,13 @@ public class GlobalKeyService extends AccessibilityService {
     private boolean isTvKey(int code) {
         return code == 4001 ||
                 code == 170 ||
-                code == 172 ||
-                code == 178 ||
                 code == KeyEvent.KEYCODE_TV ||
-                code == KeyEvent.KEYCODE_GUIDE ||
-                code == KeyEvent.KEYCODE_TV_INPUT ||
                 code == 4121 || code == 4164 ||
                 (code >= 4503 && code <= 4509);
+    }
+
+    private boolean isInputKey(int code) {
+        return code == 178 || code == KeyEvent.KEYCODE_TV_INPUT;
     }
 
     private boolean isListKey(int code) {
