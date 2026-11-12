@@ -108,7 +108,7 @@ public class QuickSettingsActivity extends Activity {
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
                         new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
                 {"Screensaver", R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
-                {"Refresh album", R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM))},
+                {"Refresh album", R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM).setPackage(getPackageName()))},
         };
 
         LinearLayout row = null;

@@ -1,5 +1,6 @@
 package tv.cleanhome.gtv;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -29,6 +30,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -207,14 +209,23 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{READ_TV}, 1);
         }
         loadPhotos();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM), Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                registerRefreshReceiverLegacy();
+            }
+        } catch (Throwable ignored) {}
+    }
+
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    private void registerRefreshReceiverLegacy() {
+        registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM));
     }
 
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
-        try {
-            registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM));
-        } catch (Throwable ignored) {}
         refreshHome();
         buildAppsGrid();
         loadWeather();
@@ -224,9 +235,6 @@ public class MainActivity extends Activity {
 
     @Override protected void onPause() {
         super.onPause();
-        try {
-            unregisterReceiver(refreshReceiver);
-        } catch (Throwable ignored) {}
         exitArrange();
         resumed = false;
         ui.removeCallbacks(weatherTick);
@@ -1658,6 +1666,9 @@ public class MainActivity extends Activity {
 
     @Override protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(refreshReceiver);
+        } catch (Throwable ignored) {}
         io.shutdownNow();
     }
 }
