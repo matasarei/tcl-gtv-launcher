@@ -3,6 +3,7 @@ package tv.cleanhome.gtv;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,6 +26,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.tv.TvContract;
@@ -860,18 +862,109 @@ public class MainActivity extends Activity {
         List<String> d = dock();
         List<Item> choices = new ArrayList<>();
         for (Item it : allApps()) if (!d.contains(it.pkg)) choices.add(it);
-        CharSequence[] names = new CharSequence[choices.size()];
-        for (int i = 0; i < names.length; i++) names[i] = choices.get(i).title;
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle("Add to Your apps")
-                .setItems(names, (dialog, which) -> {
+
+        Dialog dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Dialog_NoActionBar);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackground(round(PANEL, dp(24)));
+        root.setPadding(dp(28), dp(24), dp(28), dp(24));
+
+        TextView title = caption("Add to Your apps", 20, WHITE);
+        title.setTypeface(medium);
+        LinearLayout.LayoutParams tlp = new LinearLayout.LayoutParams(-2, -2);
+        tlp.bottomMargin = dp(16);
+        root.addView(title, tlp);
+
+        if (choices.isEmpty()) {
+            TextView empty = caption("All installed apps are already on Your apps.", 15, GREY);
+            empty.setPadding(0, dp(12), 0, dp(16));
+            root.addView(empty);
+
+            TextView close = caption("Close", 15, WHITE);
+            close.setFocusable(true);
+            close.setClickable(true);
+            close.setBackground(round(TILE, dp(12)));
+            close.setPadding(dp(24), dp(10), dp(24), dp(10));
+            close.setGravity(Gravity.CENTER);
+            close.setOnFocusChangeListener((v, has) -> {
+                close.setBackground(round(has ? TILE_FOCUS : TILE, dp(12)));
+                close.setTextColor(has ? DARK_TEXT : WHITE);
+            });
+            close.setOnClickListener(v -> dialog.dismiss());
+            root.addView(close, new LinearLayout.LayoutParams(-2, -2));
+            dialog.setOnShowListener(di -> close.requestFocus());
+        } else {
+            ScrollView scroll = new ScrollView(this);
+            scroll.setVerticalScrollBarEnabled(false);
+            scroll.setClipToPadding(false);
+
+            LinearLayout list = new LinearLayout(this);
+            list.setOrientation(LinearLayout.VERTICAL);
+            list.setClipToPadding(false);
+            list.setClipChildren(false);
+
+            View[] firstItem = new View[1];
+            for (Item it : choices) {
+                LinearLayout itemRow = new LinearLayout(this);
+                itemRow.setOrientation(LinearLayout.HORIZONTAL);
+                itemRow.setGravity(Gravity.CENTER_VERTICAL);
+                itemRow.setFocusable(true);
+                itemRow.setClickable(true);
+                itemRow.setBackground(round(TILE, dp(12)));
+                itemRow.setPadding(dp(16), dp(10), dp(16), dp(10));
+
+                ImageView icon = new ImageView(this);
+                icon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                icon.setBackground(oval(CIRCLE));
+                icon.setClipToOutline(true);
+                icon.setImageDrawable(appIcon(it.pkg, dp(42)));
+                LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(42), dp(42));
+                iconLp.setMarginEnd(dp(16));
+                itemRow.addView(icon, iconLp);
+
+                TextView name = caption(it.title, 16, WHITE);
+                name.setTypeface(medium);
+                itemRow.addView(name, new LinearLayout.LayoutParams(0, -2, 1f));
+
+                itemRow.setOnFocusChangeListener((v, has) -> {
+                    itemRow.setBackground(round(has ? TILE_FOCUS : TILE, dp(12)));
+                    name.setTextColor(has ? DARK_TEXT : WHITE);
+                    itemRow.animate().scaleX(has ? 1.02f : 1f).scaleY(has ? 1.02f : 1f).setDuration(120).start();
+                });
+
+                itemRow.setOnClickListener(v -> {
+                    dialog.dismiss();
                     d.removeIf(p -> launchIntent(p) == null);
-                    d.add(choices.get(which).pkg);
+                    d.add(it.pkg);
                     saveDock(d);
                     refreshHome();
                     focusIndex = d.size() - 1;
-                })
-                .show();
+                });
+
+                LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(dp(480), -2);
+                rowLp.bottomMargin = dp(8);
+                list.addView(itemRow, rowLp);
+
+                if (firstItem[0] == null) firstItem[0] = itemRow;
+            }
+
+            int contentHeight = Math.min(dp(440), choices.size() * dp(68));
+            LinearLayout.LayoutParams scrollLp = new LinearLayout.LayoutParams(dp(480), contentHeight);
+            root.addView(scroll, scrollLp);
+            scroll.addView(list);
+
+            dialog.setOnShowListener(di -> {
+                if (firstItem[0] != null) firstItem[0].requestFocus();
+            });
+        }
+
+        dialog.setContentView(root);
+        dialog.show();
     }
 
     // ---- arrange Your apps (Google TV's Reorder) ----
