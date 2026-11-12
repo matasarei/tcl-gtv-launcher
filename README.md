@@ -110,7 +110,7 @@ Accept the **"Allow USB debugging"** prompt on the TV screen when it appears.
 
 - **Remote buttons:** Verify that Home, Settings, Profile, TV, and LIST keys trigger their corresponding functions.
 - **Your apps:** Add your favorite apps with `+`; hold OK on any icon to reorder or remove it.
-- **Weather:** Automatically resolved via IP geolocation. Set `weather_city` in `launcher/app/src/main/res/values/config.xml` to lock in a specific city.
+- **Weather:** Automatically resolved via IP geolocation, with temperature units (°C or °F) automatically chosen based on location/locale (customizable via `temperature_unit` and `weather_city` in `launcher/app/src/main/res/values/config.xml`).
 - **Security:** Once set up, disable USB / Network debugging in Developer Options and revoke debugging authorizations. Verify with:
   ```bash
   cleanyourtv/tools/venv/bin/python cleanyourtv/tools/adb-closed.py <tv-ip>
