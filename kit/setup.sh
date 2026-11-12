@@ -81,7 +81,7 @@ fi
 step "Reboot and confirm"
 P "reboot" >/dev/null 2>&1 || true; sleep 90
 until P "getprop sys.boot_completed" 2>/dev/null | grep -q 1; do sleep 10; done; sleep 15
-P "input keyevent KEYCODE_HOME"
+P "input keyevent KEYCODE_HOME" || true
 sleep 2
 P "dumpsys activity activities | grep mFocusedApp"
 P --screenshot "shots/$TV_HOST-02-home.png"

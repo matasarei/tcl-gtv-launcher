@@ -1387,7 +1387,9 @@ public class MainActivity extends Activity {
         if (DEFAULT_WALLPAPERS.length == 0) return;
         int resId = DEFAULT_WALLPAPERS[defaultPhotoIndex++ % DEFAULT_WALLPAPERS.length];
         io.execute(() -> {
-            Bitmap b = BitmapFactory.decodeResource(getResources(), resId);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inPreferredConfig = Bitmap.Config.RGB_565;
+            Bitmap b = BitmapFactory.decodeResource(getResources(), resId, opts);
             ui.post(() -> {
                 if (b != null) {
                     ImageView in = currentPhoto == photoA ? photoB : photoA;
