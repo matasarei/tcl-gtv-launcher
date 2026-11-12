@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Accueil</string>
+    <string name="tab_apps">Applications</string>
+    <string name="tab_live">Direct</string>
+    <string name="action_inputs">Entrées</string>
+    <string name="action_screensaver">Écran de veille</string>
+    <string name="action_quick_settings">Paramètres rapides</string>
+    <string name="section_your_apps">Vos applications</string>
+    <string name="section_continue_watching">Reprendre la lecture</string>
+    <string name="section_recently_added_plex">Récemment ajoutés sur Plex</string>
+    <string name="section_for_you_youtube">Recommandations YouTube</string>
+    <string name="section_subscriptions">Abonnements</string>
+    <string name="add_app">Ajouter</string>
+    <string name="all_apps">Toutes les applications</string>
+    <string name="reorder">Réorganiser</string>
+    <string name="done">Terminé</string>
+    <string name="hint_press_to_move">APPUYER POUR DÉPLACER</string>
+    <string name="hint_press_to_confirm">APPUYER POUR CONFIRMER</string>
+    <string name="action_move">Déplacer</string>
+    <string name="action_remove_from_dock">Retirer de Vos applications</string>
+    <string name="add_to_dock_title">Ajouter à Vos applications</string>
+    <string name="all_apps_already_added">Toutes les applications installées sont déjà ajoutées.</string>
+    <string name="close">Fermer</string>
+    <string name="settings">Paramètres</string>
+    <string name="tile_apps">Applications</string>
+    <string name="tile_accounts">Comptes</string>
+    <string name="tile_inputs">Entrées</string>
+    <string name="tile_picture">Image</string>
+    <string name="tile_network">Réseau</string>
+    <string name="tile_remotes">Télécommandes</string>
+    <string name="tile_accessibility">Accessibilité</string>
+    <string name="tile_screensaver">Écran de veille</string>
+    <string name="tile_refresh_album">Actualiser l\'album</string>
+    <string name="plex_link_title">Associer un serveur Plex</string>
+    <string name="plex_getting_code">Obtention du code…</string>
+    <string name="plex_link_dialog_title">Associer Plex</string>
+    <string name="cancel">Annuler</string>
+    <string name="plex_code_instructions">Sur votre téléphone ou ordinateur, visitez\nplex.tv/link\net saisissez\n\n%1$s</string>
+    <string name="plex_error_connection">Impossible de joindre plex.tv. Vérifiez la connexion Internet du téléviseur.</string>
+    <string name="arrange_your_apps">Organiser vos applications</string>
+    <string name="plex_no_server">Associé, mais aucun serveur Plex n\'a répondu sur ce réseau.</string>
+</resources>

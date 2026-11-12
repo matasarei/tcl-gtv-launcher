@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Pagrindinis</string>
+    <string name="tab_apps">Programos</string>
+    <string name="tab_live">Tiesioginė TV</string>
+    <string name="action_inputs">Įvestys</string>
+    <string name="action_screensaver">Ekrano užsklanda</string>
+    <string name="action_quick_settings">Greitieji nustatymai</string>
+    <string name="section_your_apps">Jūsų programos</string>
+    <string name="section_continue_watching">Tęsti žiūrėjimą</string>
+    <string name="section_recently_added_plex">Neseniai pridėta „Plex“</string>
+    <string name="section_for_you_youtube">Jums „YouTube“</string>
+    <string name="section_subscriptions">Prenumeratos</string>
+    <string name="add_app">Pridėti</string>
+    <string name="all_apps">Visos programos</string>
+    <string name="reorder">Pertvarkyti</string>
+    <string name="done">Atlikta</string>
+    <string name="hint_press_to_move">PASPAUSKITE, KAD PERKELTUMĖTE</string>
+    <string name="hint_press_to_confirm">PASPAUSKITE, KAD PATVIRTINTUMĖTE</string>
+    <string name="action_move">Perkelti</string>
+    <string name="action_remove_from_dock">Pašalinti iš Jūsų programų</string>
+    <string name="add_to_dock_title">Pridėti prie Jūsų programų</string>
+    <string name="all_apps_already_added">Visos įdiegtos programos jau pridėtos.</string>
+    <string name="close">Uždaryti</string>
+    <string name="settings">Nustatymai</string>
+    <string name="tile_apps">Programos</string>
+    <string name="tile_accounts">Paskyros</string>
+    <string name="tile_inputs">Įvestys</string>
+    <string name="tile_picture">Vaizdas</string>
+    <string name="tile_network">Tinklas</string>
+    <string name="tile_remotes">Pultai</string>
+    <string name="tile_accessibility">Pritaikymas neįgaliesiems</string>
+    <string name="tile_screensaver">Užsklanda</string>
+    <string name="tile_refresh_album">Atnaujinti albumą</string>
+    <string name="plex_link_title">Susieti „Plex“ serverį</string>
+    <string name="plex_getting_code">Gaunamas kodas…</string>
+    <string name="plex_link_dialog_title">Susieti „Plex“</string>
+    <string name="cancel">Atšaukti</string>
+    <string name="plex_code_instructions">Telefone ar kompiuteryje atidarykite\nplex.tv/link\nir įveskite\n\n%1$s</string>
+    <string name="plex_error_connection">Nepavyko pasiekti plex.tv. Patikrinkite televizoriaus interneto ryšį.</string>
+    <string name="arrange_your_apps">Tvarkyti programas</string>
+    <string name="plex_no_server">Susieta, bet šiame tinkle nerastas joks „Plex“ serveris.</string>
+</resources>

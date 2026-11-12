@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Acasă</string>
+    <string name="tab_apps">Aplicații</string>
+    <string name="tab_live">În direct</string>
+    <string name="action_inputs">Intrări</string>
+    <string name="action_screensaver">Screensaver</string>
+    <string name="action_quick_settings">Setări rapide</string>
+    <string name="section_your_apps">Aplicațiile tale</string>
+    <string name="section_continue_watching">Continuă vizionarea</string>
+    <string name="section_recently_added_plex">Adăugate recent pe Plex</string>
+    <string name="section_for_you_youtube">Pentru tine pe YouTube</string>
+    <string name="section_subscriptions">Abonamente</string>
+    <string name="add_app">Adaugă</string>
+    <string name="all_apps">Toate aplicațiile</string>
+    <string name="reorder">Reorganizează</string>
+    <string name="done">Gata</string>
+    <string name="hint_press_to_move">APASĂ PENTRU A MUTA</string>
+    <string name="hint_press_to_confirm">APASĂ PENTRU A CONFIRMA</string>
+    <string name="action_move">Mută</string>
+    <string name="action_remove_from_dock">Elimină din Aplicațiile tale</string>
+    <string name="add_to_dock_title">Adaugă la Aplicațiile tale</string>
+    <string name="all_apps_already_added">Toate aplicațiile instalate sunt deja adăugate.</string>
+    <string name="close">Închide</string>
+    <string name="settings">Setări</string>
+    <string name="tile_apps">Aplicații</string>
+    <string name="tile_accounts">Conturi</string>
+    <string name="tile_inputs">Intrări</string>
+    <string name="tile_picture">Imagine</string>
+    <string name="tile_network">Rețea</string>
+    <string name="tile_remotes">Telecomenzi</string>
+    <string name="tile_accessibility">Accesibilitate</string>
+    <string name="tile_screensaver">Screensaver</string>
+    <string name="tile_refresh_album">Actualizează albumul</string>
+    <string name="plex_link_title">Conectează serverul Plex</string>
+    <string name="plex_getting_code">Se obține codul…</string>
+    <string name="plex_link_dialog_title">Conectare Plex</string>
+    <string name="cancel">Anulează</string>
+    <string name="plex_code_instructions">Pe telefon sau computer accesează\nplex.tv/link\nși introdu\n\n%1$s</string>
+    <string name="plex_error_connection">Nu s-a putut contacta plex.tv. Verifică conexiunea la internet a televizorului.</string>
+    <string name="arrange_your_apps">Organizează aplicațiile</string>
+    <string name="plex_no_server">Conectat, dar niciun server Plex nu a răspuns în această rețea.</string>
+</resources>

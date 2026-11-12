@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Home</string>
+    <string name="tab_apps">Apps</string>
+    <string name="tab_live">Live tv</string>
+    <string name="action_inputs">Ingangen</string>
+    <string name="action_screensaver">Schermbeveiliging</string>
+    <string name="action_quick_settings">Snelle instellingen</string>
+    <string name="section_your_apps">Jouw apps</string>
+    <string name="section_continue_watching">Verder kijken</string>
+    <string name="section_recently_added_plex">Onlangs toegevoegd op Plex</string>
+    <string name="section_for_you_youtube">Voor jou op YouTube</string>
+    <string name="section_subscriptions">Abonnementen</string>
+    <string name="add_app">App toevoegen</string>
+    <string name="all_apps">Alle apps</string>
+    <string name="reorder">Herschikken</string>
+    <string name="done">Gereed</string>
+    <string name="hint_press_to_move">DRUK OM TE VERPLAATSEN</string>
+    <string name="hint_press_to_confirm">DRUK OM TE BEVESTIGEN</string>
+    <string name="action_move">Verplaatsen</string>
+    <string name="action_remove_from_dock">Verwijderen uit Jouw apps</string>
+    <string name="add_to_dock_title">Toevoegen aan Jouw apps</string>
+    <string name="all_apps_already_added">Alle geïnstalleerde apps staan al in Jouw apps.</string>
+    <string name="close">Sluiten</string>
+    <string name="settings">Instellingen</string>
+    <string name="tile_apps">Apps</string>
+    <string name="tile_accounts">Accounts</string>
+    <string name="tile_inputs">Ingangen</string>
+    <string name="tile_picture">Beeld</string>
+    <string name="tile_network">Netwerk</string>
+    <string name="tile_remotes">Afstandsbedieningen</string>
+    <string name="tile_accessibility">Toegankelijkheid</string>
+    <string name="tile_screensaver">Schermbeveiliging</string>
+    <string name="tile_refresh_album">Album vernieuwen</string>
+    <string name="plex_link_title">Koppel je Plex-server</string>
+    <string name="plex_getting_code">Code ophalen…</string>
+    <string name="plex_link_dialog_title">Plex koppelen</string>
+    <string name="cancel">Annuleren</string>
+    <string name="plex_code_instructions">Ga op je telefoon of computer naar\nplex.tv/link\nen voer in:\n\n%1$s</string>
+    <string name="plex_error_connection">Kan plex.tv niet bereiken. Controleer de internetverbinding van de tv.</string>
+    <string name="arrange_your_apps">Apps rangschikken</string>
+    <string name="plex_no_server">Gekoppeld, maar geen Plex-server gevonden op dit netwerk.</string>
+</resources>

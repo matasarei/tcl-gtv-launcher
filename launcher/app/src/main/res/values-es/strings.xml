@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Inicio</string>
+    <string name="tab_apps">Aplicaciones</string>
+    <string name="tab_live">En directo</string>
+    <string name="action_inputs">Entradas</string>
+    <string name="action_screensaver">Salvapantallas</string>
+    <string name="action_quick_settings">Ajustes rápidos</string>
+    <string name="section_your_apps">Tus aplicaciones</string>
+    <string name="section_continue_watching">Seguir viendo</string>
+    <string name="section_recently_added_plex">Añadidos recientemente a Plex</string>
+    <string name="section_for_you_youtube">Para ti en YouTube</string>
+    <string name="section_subscriptions">Suscripciones</string>
+    <string name="add_app">Añadir</string>
+    <string name="all_apps">Todas las aplicaciones</string>
+    <string name="reorder">Reordenar</string>
+    <string name="done">Listo</string>
+    <string name="hint_press_to_move">PULSA PARA MOVER</string>
+    <string name="hint_press_to_confirm">PULSA PARA CONFIRMAR</string>
+    <string name="action_move">Mover</string>
+    <string name="action_remove_from_dock">Quitar de Tus aplicaciones</string>
+    <string name="add_to_dock_title">Añadir a Tus aplicaciones</string>
+    <string name="all_apps_already_added">Todas las aplicaciones instaladas ya están añadidas.</string>
+    <string name="close">Cerrar</string>
+    <string name="settings">Ajustes</string>
+    <string name="tile_apps">Aplicaciones</string>
+    <string name="tile_accounts">Cuentas</string>
+    <string name="tile_inputs">Entradas</string>
+    <string name="tile_picture">Imagen</string>
+    <string name="tile_network">Red</string>
+    <string name="tile_remotes">Mandos</string>
+    <string name="tile_accessibility">Accesibilidad</string>
+    <string name="tile_screensaver">Salvapantallas</string>
+    <string name="tile_refresh_album">Actualizar álbum</string>
+    <string name="plex_link_title">Vincular servidor Plex</string>
+    <string name="plex_getting_code">Obteniendo código…</string>
+    <string name="plex_link_dialog_title">Vincular Plex</string>
+    <string name="cancel">Cancelar</string>
+    <string name="plex_code_instructions">En tu teléfono u ordenador, entra en\nplex.tv/link\ne introduce\n\n%1$s</string>
+    <string name="plex_error_connection">No se pudo conectar con plex.tv. Revisa la conexión de red del televisor.</string>
+    <string name="arrange_your_apps">Organizar tus aplicaciones</string>
+    <string name="plex_no_server">Vinculado, pero no se encontró ningún servidor Plex en esta red.</string>
+</resources>

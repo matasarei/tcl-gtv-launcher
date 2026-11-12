@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Головна</string>
+    <string name="tab_apps">Додатки</string>
+    <string name="tab_live">ТБ</string>
+    <string name="action_inputs">Входи</string>
+    <string name="action_screensaver">Заставка</string>
+    <string name="action_quick_settings">Швидкі налаштування</string>
+    <string name="section_your_apps">Ваші додатки</string>
+    <string name="section_continue_watching">Продовжити перегляд</string>
+    <string name="section_recently_added_plex">Нещодавно додані в Plex</string>
+    <string name="section_for_you_youtube">Для вас на YouTube</string>
+    <string name="section_subscriptions">Підписки</string>
+    <string name="add_app">Додати</string>
+    <string name="all_apps">Усі додатки</string>
+    <string name="reorder">Впорядкувати</string>
+    <string name="done">Готово</string>
+    <string name="hint_press_to_move">НАТИСНІТЬ ДЛЯ ПЕРЕМІЩЕННЯ</string>
+    <string name="hint_press_to_confirm">НАТИСНІТЬ ДЛЯ ПІДТВЕРДЖЕННЯ</string>
+    <string name="action_move">Перемістити</string>
+    <string name="action_remove_from_dock">Вилучити з Ваших додатків</string>
+    <string name="add_to_dock_title">Додати до Ваших додатків</string>
+    <string name="all_apps_already_added">Усі встановлені додатки вже додано.</string>
+    <string name="close">Закрити</string>
+    <string name="settings">Налаштування</string>
+    <string name="tile_apps">Додатки</string>
+    <string name="tile_accounts">Облікові записи</string>
+    <string name="tile_inputs">Входи</string>
+    <string name="tile_picture">Зображення</string>
+    <string name="tile_network">Мережа</string>
+    <string name="tile_remotes">Пульти</string>
+    <string name="tile_accessibility">Спеціальні можливості</string>
+    <string name="tile_screensaver">Заставка</string>
+    <string name="tile_refresh_album">Оновити альбом</string>
+    <string name="plex_link_title">Підключити сервер Plex</string>
+    <string name="plex_getting_code">Отримання коду…</string>
+    <string name="plex_link_dialog_title">Підключення Plex</string>
+    <string name="cancel">Скасувати</string>
+    <string name="plex_code_instructions">На телефоні або комп\'ютері відкрийте\nplex.tv/link\nі введіть\n\n%1$s</string>
+    <string name="plex_error_connection">Не вдалося зв\'язатися з plex.tv. Перевірте інтернет-з\'єднання на телевізорі.</string>
+    <string name="arrange_your_apps">Впорядкування додатків</string>
+    <string name="plex_no_server">Підключено, але сервер Plex не знайдено в цій мережі.</string>
+</resources>

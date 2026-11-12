@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Avaleht</string>
+    <string name="tab_apps">Rakendused</string>
+    <string name="tab_live">Otse-TV</string>
+    <string name="action_inputs">Sisendid</string>
+    <string name="action_screensaver">Ekraanisäästja</string>
+    <string name="action_quick_settings">Kiirsätted</string>
+    <string name="section_your_apps">Teie rakendused</string>
+    <string name="section_continue_watching">Jätka vaatamist</string>
+    <string name="section_recently_added_plex">Hiljuti lisatud Plexi</string>
+    <string name="section_for_you_youtube">Teile YouTubes</string>
+    <string name="section_subscriptions">Tellimused</string>
+    <string name="add_app">Lisa</string>
+    <string name="all_apps">Kõik rakendused</string>
+    <string name="reorder">Järjesta ümber</string>
+    <string name="done">Valmis</string>
+    <string name="hint_press_to_move">VAJUTA LIIGUTAMISEKS</string>
+    <string name="hint_press_to_confirm">VAJUTA KINNITAMISEKS</string>
+    <string name="action_move">Liiguta</string>
+    <string name="action_remove_from_dock">Eemalda Teie rakendustest</string>
+    <string name="add_to_dock_title">Lisa Teie rakendustesse</string>
+    <string name="all_apps_already_added">Kõik installitud rakendused on juba lisatud.</string>
+    <string name="close">Sulge</string>
+    <string name="settings">Sätted</string>
+    <string name="tile_apps">Rakendused</string>
+    <string name="tile_accounts">Kontod</string>
+    <string name="tile_inputs">Sisendid</string>
+    <string name="tile_picture">Pilt</string>
+    <string name="tile_network">Võrk</string>
+    <string name="tile_remotes">Puldid</string>
+    <string name="tile_accessibility">Hõlbustus</string>
+    <string name="tile_screensaver">Ekraanisäästja</string>
+    <string name="tile_refresh_album">Värskenda albumit</string>
+    <string name="plex_link_title">Seo Plexi server</string>
+    <string name="plex_getting_code">Koodi hankimine…</string>
+    <string name="plex_link_dialog_title">Seo Plex</string>
+    <string name="cancel">Tühista</string>
+    <string name="plex_code_instructions">Avage telefonis või arvutis\nplex.tv/link\nja sisestage\n\n%1$s</string>
+    <string name="plex_error_connection">Ei saanud ühendust saidiga plex.tv. Kontrollige teleri internetiühendust.</string>
+    <string name="arrange_your_apps">Korralda oma rakendused</string>
+    <string name="plex_no_server">Seotud, kuid sellest võrgust ei leitud ühtegi Plexi serverit.</string>
+</resources>

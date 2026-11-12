@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Home</string>
+    <string name="tab_apps">App</string>
+    <string name="tab_live">TV in diretta</string>
+    <string name="action_inputs">Ingressi</string>
+    <string name="action_screensaver">Salvaschermo</string>
+    <string name="action_quick_settings">Impostazioni rapide</string>
+    <string name="section_your_apps">Le tue app</string>
+    <string name="section_continue_watching">Continua a guardare</string>
+    <string name="section_recently_added_plex">Aggiunti di recente su Plex</string>
+    <string name="section_for_you_youtube">Per te su YouTube</string>
+    <string name="section_subscriptions">Iscrizioni</string>
+    <string name="add_app">Aggiungi app</string>
+    <string name="all_apps">Tutte le app</string>
+    <string name="reorder">Riordina</string>
+    <string name="done">Fine</string>
+    <string name="hint_press_to_move">PREMI PER SPOSTARE</string>
+    <string name="hint_press_to_confirm">PREMI PER CONFERMARE</string>
+    <string name="action_move">Sposta</string>
+    <string name="action_remove_from_dock">Rimuovi da Le tue app</string>
+    <string name="add_to_dock_title">Aggiungi a Le tue app</string>
+    <string name="all_apps_already_added">Tutte le app installate sono già state aggiunte.</string>
+    <string name="close">Chiudi</string>
+    <string name="settings">Impostazioni</string>
+    <string name="tile_apps">App</string>
+    <string name="tile_accounts">Account</string>
+    <string name="tile_inputs">Ingressi</string>
+    <string name="tile_picture">Immagine</string>
+    <string name="tile_network">Rete</string>
+    <string name="tile_remotes">Telecomandi</string>
+    <string name="tile_accessibility">Accessibilità</string>
+    <string name="tile_screensaver">Salvaschermo</string>
+    <string name="tile_refresh_album">Aggiorna album</string>
+    <string name="plex_link_title">Collega server Plex</string>
+    <string name="plex_getting_code">Recupero codice…</string>
+    <string name="plex_link_dialog_title">Collega Plex</string>
+    <string name="cancel">Annulla</string>
+    <string name="plex_code_instructions">Sul tuo smartphone o computer, vai su\nplex.tv/link\ne inserisci\n\n%1$s</string>
+    <string name="plex_error_connection">Impossibile raggiungere plex.tv. Controlla la connessione internet della TV.</string>
+    <string name="arrange_your_apps">Organizza le tue app</string>
+    <string name="plex_no_server">Collegato, ma nessun server Plex ha risposto su questa rete.</string>
+</resources>

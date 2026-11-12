@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Начало</string>
+    <string name="tab_apps">Приложения</string>
+    <string name="tab_live">Телевизия</string>
+    <string name="action_inputs">Входове</string>
+    <string name="action_screensaver">Скрийнсейвър</string>
+    <string name="action_quick_settings">Бързи настройки</string>
+    <string name="section_your_apps">Вашите приложения</string>
+    <string name="section_continue_watching">Продължи гледането</string>
+    <string name="section_recently_added_plex">Наскоро добавени в Plex</string>
+    <string name="section_for_you_youtube">За вас в YouTube</string>
+    <string name="section_subscriptions">Абонаменти</string>
+    <string name="add_app">Добави</string>
+    <string name="all_apps">Всички приложения</string>
+    <string name="reorder">Пренареди</string>
+    <string name="done">Готово</string>
+    <string name="hint_press_to_move">НАТИСНЕТЕ ЗА ПРЕМЕСТВАНЕ</string>
+    <string name="hint_press_to_confirm">НАТИСНЕТЕ ЗА ПОТВЪРЖДЕНИЕ</string>
+    <string name="action_move">Премести</string>
+    <string name="action_remove_from_dock">Премахни от Вашите приложения</string>
+    <string name="add_to_dock_title">Добави към Вашите приложения</string>
+    <string name="all_apps_already_added">Всички инсталирани приложения вече са добавени.</string>
+    <string name="close">Затвори</string>
+    <string name="settings">Настройки</string>
+    <string name="tile_apps">Приложения</string>
+    <string name="tile_accounts">Профили</string>
+    <string name="tile_inputs">Входове</string>
+    <string name="tile_picture">Картина</string>
+    <string name="tile_network">Мрежа</string>
+    <string name="tile_remotes">Дистанционни</string>
+    <string name="tile_accessibility">Достъпност</string>
+    <string name="tile_screensaver">Скрийнсейвър</string>
+    <string name="tile_refresh_album">Обнови албума</string>
+    <string name="plex_link_title">Свържи с Plex сървър</string>
+    <string name="plex_getting_code">Получаване на код…</string>
+    <string name="plex_link_dialog_title">Свързване с Plex</string>
+    <string name="cancel">Отказ</string>
+    <string name="plex_code_instructions">На телефон или компютър отворете\nplex.tv/link\nи въведете\n\n%1$s</string>
+    <string name="plex_error_connection">Няма връзка с plex.tv. Проверете интернет връзката на телевизора.</string>
+    <string name="arrange_your_apps">Подреждане на приложенията</string>
+    <string name="plex_no_server">Свързано, но няма открит Plex сървър в тази мрежа.</string>
+</resources>

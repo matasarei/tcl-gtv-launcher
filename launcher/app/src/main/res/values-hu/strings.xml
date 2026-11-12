@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Kezdőlap</string>
+    <string name="tab_apps">Alkalmazások</string>
+    <string name="tab_live">Élő adás</string>
+    <string name="action_inputs">Bemenetek</string>
+    <string name="action_screensaver">Képernyőkímélő</string>
+    <string name="action_quick_settings">Gyorsbeállítások</string>
+    <string name="section_your_apps">Alkalmazásaid</string>
+    <string name="section_continue_watching">Megtekintés folytatása</string>
+    <string name="section_recently_added_plex">Nemrég hozzáadva a Plexen</string>
+    <string name="section_for_you_youtube">Neked a YouTube-on</string>
+    <string name="section_subscriptions">Feliratkozások</string>
+    <string name="add_app">Hozzáadás</string>
+    <string name="all_apps">Összes alkalmazás</string>
+    <string name="reorder">Átrendezés</string>
+    <string name="done">Kész</string>
+    <string name="hint_press_to_move">NYOMD MEG A MOZGATÁSHOZ</string>
+    <string name="hint_press_to_confirm">NYOMD MEG A MEGERŐSÍTÉSHEZ</string>
+    <string name="action_move">Mozgatás</string>
+    <string name="action_remove_from_dock">Eltávolítás az Alkalmazásaid közül</string>
+    <string name="add_to_dock_title">Hozzáadás az Alkalmazásaidhoz</string>
+    <string name="all_apps_already_added">Minden telepített alkalmazás hozzá van már adva.</string>
+    <string name="close">Bezárás</string>
+    <string name="settings">Beállítások</string>
+    <string name="tile_apps">Alkalmazások</string>
+    <string name="tile_accounts">Fiókok</string>
+    <string name="tile_inputs">Bemenetek</string>
+    <string name="tile_picture">Kép</string>
+    <string name="tile_network">Hálózat</string>
+    <string name="tile_remotes">Távirányítók</string>
+    <string name="tile_accessibility">Kisegítő lehetőségek</string>
+    <string name="tile_screensaver">Képernyőkímélő</string>
+    <string name="tile_refresh_album">Album frissítése</string>
+    <string name="plex_link_title">Plex szerver csatolása</string>
+    <string name="plex_getting_code">Kód lekérése…</string>
+    <string name="plex_link_dialog_title">Plex csatolása</string>
+    <string name="cancel">Mégse</string>
+    <string name="plex_code_instructions">Nyisd meg telefonodon vagy gépeden a\nplex.tv/link\noldalt, és add meg ezt:\n\n%1$s</string>
+    <string name="plex_error_connection">Nem érhető el a plex.tv. Ellenőrizd a TV internetkapcsolatát.</string>
+    <string name="arrange_your_apps">Alkalmazások rendezése</string>
+    <string name="plex_no_server">Csatolva, de nem található Plex szerver ezen a hálózaton.</string>
+</resources>

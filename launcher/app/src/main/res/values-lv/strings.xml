@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Sākums</string>
+    <string name="tab_apps">Lietotnes</string>
+    <string name="tab_live">Tiešraides TV</string>
+    <string name="action_inputs">Ievades</string>
+    <string name="action_screensaver">Ekrānsaudzētājs</string>
+    <string name="action_quick_settings">Ātrie iestatījumi</string>
+    <string name="section_your_apps">Jūsu lietotnes</string>
+    <string name="section_continue_watching">Turpināt skatīties</string>
+    <string name="section_recently_added_plex">Nesen pievienots Plex</string>
+    <string name="section_for_you_youtube">Jums pakalpojumā YouTube</string>
+    <string name="section_subscriptions">Abonementi</string>
+    <string name="add_app">Pievienot</string>
+    <string name="all_apps">Visas lietotnes</string>
+    <string name="reorder">Pārkārtot</string>
+    <string name="done">Gatavs</string>
+    <string name="hint_press_to_move">NOPIEDIET, LAI PĀRVIETOTU</string>
+    <string name="hint_press_to_confirm">NOPIEDIET, LAI APSTIPRINĀTU</string>
+    <string name="action_move">Pārvietot</string>
+    <string name="action_remove_from_dock">Noņemt no Jūsu lietotnēm</string>
+    <string name="add_to_dock_title">Pievienot Jūsu lietotnēm</string>
+    <string name="all_apps_already_added">Visas instalētās lietotnes jau ir pievienotas.</string>
+    <string name="close">Aizvērt</string>
+    <string name="settings">Iestatījumi</string>
+    <string name="tile_apps">Lietotnes</string>
+    <string name="tile_accounts">Konti</string>
+    <string name="tile_inputs">Ievades</string>
+    <string name="tile_picture">Attēls</string>
+    <string name="tile_network">Tīkls</string>
+    <string name="tile_remotes">Pultis</string>
+    <string name="tile_accessibility">Pieejamība</string>
+    <string name="tile_screensaver">Ekrānsaudzētājs</string>
+    <string name="tile_refresh_album">Atsvaidzināt albumu</string>
+    <string name="plex_link_title">Piesaistīt Plex serveri</string>
+    <string name="plex_getting_code">Iegūst kodu…</string>
+    <string name="plex_link_dialog_title">Piesaistīt Plex</string>
+    <string name="cancel">Atcelt</string>
+    <string name="plex_code_instructions">Tālrunī vai datorā atveriet\nplex.tv/link\nun ievadiet\n\n%1$s</string>
+    <string name="plex_error_connection">Nevarēja sazināties ar plex.tv. Pārbaudiet televizora interneta savienojumu.</string>
+    <string name="arrange_your_apps">Sakārtot lietotnes</string>
+    <string name="plex_no_server">Piesaistīts, taču šajā tīklā netika atrasts neviens Plex serveris.</string>
+</resources>

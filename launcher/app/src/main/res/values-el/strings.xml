@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_home">Αρχική</string>
+    <string name="tab_apps">Εφαρμογές</string>
+    <string name="tab_live">Ζωντανά</string>
+    <string name="action_inputs">Είσοδοι</string>
+    <string name="action_screensaver">Προφύλαξη οθόνης</string>
+    <string name="action_quick_settings">Γρήγορες ρυθμίσεις</string>
+    <string name="section_your_apps">Οι εφαρμογές σας</string>
+    <string name="section_continue_watching">Συνέχιση προβολής</string>
+    <string name="section_recently_added_plex">Πρόσφατα στο Plex</string>
+    <string name="section_for_you_youtube">Για εσάς στο YouTube</string>
+    <string name="section_subscriptions">Συνδρομές</string>
+    <string name="add_app">Προσθήκη</string>
+    <string name="all_apps">Όλες οι εφαρμογές</string>
+    <string name="reorder">Αναδιάταξη</string>
+    <string name="done">Τέλος</string>
+    <string name="hint_press_to_move">ΠΑΤΗΣΤΕ ΓΙΑ ΜΕΤΑΚΙΝΗΣΗ</string>
+    <string name="hint_press_to_confirm">ΠΑΤΗΣΤΕ ΓΙΑ ΕΠΙΒΕΒΑΙΩΣΗ</string>
+    <string name="action_move">Μετακίνηση</string>
+    <string name="action_remove_from_dock">Κατάργηση από τις Εφαρμογές σας</string>
+    <string name="add_to_dock_title">Προσθήκη στις Εφαρμογές σας</string>
+    <string name="all_apps_already_added">Όλες οι εγκατεστημένες εφαρμογές έχουν ήδη προστεθεί.</string>
+    <string name="close">Κλείσιμο</string>
+    <string name="settings">Ρυθμίσεις</string>
+    <string name="tile_apps">Εφαρμογές</string>
+    <string name="tile_accounts">Λογαριασμοί</string>
+    <string name="tile_inputs">Είσοδοι</string>
+    <string name="tile_picture">Εικόνα</string>
+    <string name="tile_network">Δίκτυο</string>
+    <string name="tile_remotes">Τηλεχειριστήρια</string>
+    <string name="tile_accessibility">Προσβασιμότητα</string>
+    <string name="tile_screensaver">Προφύλαξη οθόνης</string>
+    <string name="tile_refresh_album">Ανανέωση άλμπουμ</string>
+    <string name="plex_link_title">Σύνδεση διακομιστή Plex</string>
+    <string name="plex_getting_code">Λήψη κωδικού…</string>
+    <string name="plex_link_dialog_title">Σύνδεση Plex</string>
+    <string name="cancel">Άκυρο</string>
+    <string name="plex_code_instructions">Στο τηλέφωνο ή στον υπολογιστή σας, μεταβείτε στο\nplex.tv/link\nκαι εισαγάγετε\n\n%1$s</string>
+    <string name="plex_error_connection">Δεν είναι δυνατή η σύνδεση με το plex.tv. Ελέγξτε τη σύνδεση της τηλεόρασης.</string>
+    <string name="arrange_your_apps">Διάταξη εφαρμογών</string>
+    <string name="plex_no_server">Συνδέθηκε, αλλά δεν βρέθηκε διακομιστής Plex σε αυτό το δίκτυο.</string>
+</resources>

@@ -84,9 +84,9 @@
             android:paddingEnd="4dp">
 
             <ImageView android:id="@+id/tab_home" style="@style/PillIcon"
-                android:contentDescription="Home" android:src="@drawable/ic_home" />
+                android:contentDescription="@string/tab_home" android:src="@drawable/ic_home" />
             <ImageView android:id="@+id/tab_apps" style="@style/PillIcon"
-                android:contentDescription="Apps" android:src="@drawable/ic_apps" />
+                android:contentDescription="@string/tab_apps" android:src="@drawable/ic_apps" />
         </LinearLayout>
 
         <LinearLayout
@@ -100,11 +100,11 @@
             android:paddingEnd="4dp">
 
             <ImageView android:id="@+id/btn_inputs" style="@style/PillIcon"
-                android:contentDescription="Inputs" android:src="@drawable/ic_input" />
+                android:contentDescription="@string/action_inputs" android:src="@drawable/ic_input" />
             <ImageView android:id="@+id/btn_screensaver" style="@style/PillIcon"
-                android:contentDescription="Screensaver" android:src="@drawable/ic_frame" />
+                android:contentDescription="@string/action_screensaver" android:src="@drawable/ic_frame" />
             <ImageView android:id="@+id/btn_quick" style="@style/PillIcon"
-                android:contentDescription="Quick Settings" android:src="@drawable/ic_settings_arrow" />
+                android:contentDescription="@string/action_quick_settings" android:src="@drawable/ic_settings_arrow" />
         </LinearLayout>
 
         <View
@@ -212,7 +212,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="All settings"
+                    android:text="@string/settings"
                     android:textColor="#E3E3E3"
                     android:textSize="11sp" />
             </LinearLayout>
