@@ -1169,15 +1169,13 @@ public class MainActivity extends Activity {
 
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
-        // Settings key: 4077 (TCL), 83 (TCL G08 / Android 14), 176 (Settings), KEYCODE_MENU (82)
-        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077 || k == 83 || k == KeyEvent.KEYCODE_NOTIFICATION) {
+        if (GlobalKeyService.isSettingsKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }
-        // Profile / Accounts key: 288 (TCL G08 / Android 14), 4016 (TCL), KEYCODE_PROFILE_SWITCH
-        if (k == 288 || k == 4016 || k == 303 || k == KeyEvent.KEYCODE_PROFILE_SWITCH) {
+        if (GlobalKeyService.isProfileKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 Intent intent = new Intent(this, QuickSettingsActivity.class);
                 intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
@@ -1185,36 +1183,32 @@ public class MainActivity extends Activity {
             }
             return true;
         }
-        // TV / Guide key: 4001 (TCL TV button), 170 (TV), 172 (Guide), KEYCODE_TV, KEYCODE_GUIDE
-        if (k == 4001 || k == 170 || k == 172 || k == KeyEvent.KEYCODE_TV || k == KeyEvent.KEYCODE_GUIDE) {
+        if (GlobalKeyService.isTvKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 openLiveTv();
             }
             return true;
         }
-        // Apps key: 174 (TCL RC833 Apps button), 284 (ALL_APPS), KEYCODE_BOOKMARK
-        if (k == 174 || k == KeyEvent.KEYCODE_BOOKMARK || k == 284 || k == KeyEvent.KEYCODE_ALL_APPS) {
+        if (GlobalKeyService.isAppsKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 selectTab(tabApps);
                 tabApps.requestFocus();
             }
             return true;
         }
-        // YouTube key: 190 (TCL RC833 YouTube button), 4065, KEYCODE_BUTTON_3
-        if (k == 190 || k == 4065 || k == KeyEvent.KEYCODE_BUTTON_3) {
+        if (GlobalKeyService.isYouTubeKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 openYouTube();
             }
             return true;
         }
-        // List key: 4090, 4126
-        if (k == 4090 || k == 4126) {
+        if (GlobalKeyService.isListKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 openLiveTv();
             }
             return true;
         }
-        if (k == KeyEvent.KEYCODE_TV_INPUT || k == 178) {
+        if (GlobalKeyService.isInputKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 openInputs();
             }

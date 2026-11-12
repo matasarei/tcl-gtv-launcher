@@ -66,8 +66,8 @@ public class GlobalKeyService extends AccessibilityService {
         Log.i(TAG, "GlobalKeyService connected: flags=" + info.flags);
     }
 
-    private boolean isHandledKey(int code) {
-        if (isListKey(code) && isTvForeground()) {
+    static boolean isHandledKey(int code, boolean isTvForeground) {
+        if (isListKey(code) && isTvForeground) {
             return false;
         }
         return isSettingsKey(code) ||
@@ -81,6 +81,10 @@ public class GlobalKeyService extends AccessibilityService {
                 code == KEYCODE_TCL_PRIMEVIDEO ||
                 code == KEYCODE_TCL_BROWSEHERE ||
                 code == KeyEvent.KEYCODE_EXPLORER;
+    }
+
+    private boolean isHandledKey(int code) {
+        return isHandledKey(code, isTvForeground());
     }
 
     @Override
@@ -162,7 +166,7 @@ public class GlobalKeyService extends AccessibilityService {
         return true;
     }
 
-    private boolean isSettingsKey(int code) {
+    static boolean isSettingsKey(int code) {
         return code == KEYCODE_TCL_SET ||
                 code == 176 ||
                 code == KeyEvent.KEYCODE_SETTINGS ||
@@ -171,13 +175,13 @@ public class GlobalKeyService extends AccessibilityService {
                 code == KeyEvent.KEYCODE_NOTIFICATION;
     }
 
-    private boolean isProfileKey(int code) {
+    static boolean isProfileKey(int code) {
         return code == KEYCODE_TCL_PROFILE ||
                 code == KEYCODE_PROFILE_SWITCH ||
                 code == KEYCODE_PROFILE_SWITCH_LEGACY;
     }
 
-    private boolean isTvKey(int code) {
+    static boolean isTvKey(int code) {
         return code == 4001 ||
                 code == 170 ||
                 code == KeyEvent.KEYCODE_TV ||
@@ -187,24 +191,24 @@ public class GlobalKeyService extends AccessibilityService {
                 (code >= 4503 && code <= 4509);
     }
 
-    private boolean isAppsKey(int code) {
+    static boolean isAppsKey(int code) {
         return code == KEYCODE_BOOKMARK ||
                 code == KeyEvent.KEYCODE_BOOKMARK ||
                 code == 284 ||
                 code == KeyEvent.KEYCODE_ALL_APPS;
     }
 
-    private boolean isInputKey(int code) {
+    static boolean isInputKey(int code) {
         return code == 178 || code == KeyEvent.KEYCODE_TV_INPUT;
     }
 
-    private boolean isYouTubeKey(int code) {
+    static boolean isYouTubeKey(int code) {
         return code == KEYCODE_TCL_YOUTUBE ||
                 code == KEYCODE_BUTTON_3 ||
                 code == KeyEvent.KEYCODE_BUTTON_3;
     }
 
-    private boolean isListKey(int code) {
+    static boolean isListKey(int code) {
         return code == KEYCODE_TCL_LIST ||
                 code == KEYCODE_TCL_RECORD_LIST;
     }
