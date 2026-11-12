@@ -103,6 +103,9 @@ public class MainActivity extends Activity {
         @Override protected int sizeOf(String k, Bitmap b) { return b.getByteCount(); }
     };
 
+    public static final String EXTRA_TAB = "extra_tab";
+    public static final String TAB_APPS = "apps";
+
     PackageManager pm;
     Typeface regular, medium;
     TextView weather, tooltip;
@@ -213,8 +216,13 @@ public class MainActivity extends Activity {
 
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((old, now) -> onFocusMoved(now));
 
-        selectTab(tabHome);
-        tabHome.requestFocus();
+        if (getIntent() != null && TAB_APPS.equals(getIntent().getStringExtra(EXTRA_TAB))) {
+            selectTab(tabApps);
+            tabApps.requestFocus();
+        } else {
+            selectTab(tabHome);
+            tabHome.requestFocus();
+        }
         if (checkSelfPermission(READ_TV) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_TV}, 1);
         }
@@ -261,6 +269,11 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         exitArrange();
         showQuick(false);
+        if (intent != null && TAB_APPS.equals(intent.getStringExtra(EXTRA_TAB))) {
+            selectTab(tabApps);
+            tabApps.requestFocus();
+            return;
+        }
         selectTab(tabHome);
         focusSection = -1;
         tabHome.requestFocus();
@@ -386,6 +399,24 @@ public class MainActivity extends Activity {
         };
         for (Intent intent : intents) {
             if (start(intent)) return;
+        }
+    }
+
+    void openLiveTv() {
+        Intent intent = pm.getLeanbackLaunchIntentForPackage("com.tcl.tv");
+        if (intent == null) intent = pm.getLaunchIntentForPackage("com.tcl.tv");
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            if (start(intent)) return;
+        }
+        String[] tvActivities = {
+                "com.tcl.player.TVActivity",
+                "com.tcl.tv.TVActivity"
+        };
+        for (String act : tvActivities) {
+            Intent actIntent = new Intent().setClassName("com.tcl.tv", act);
+            actIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (start(actIntent)) return;
         }
     }
 
@@ -1103,16 +1134,47 @@ public class MainActivity extends Activity {
 
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
-        // 4077 is TCL's proprietary OEM keycode for the remote's physical Settings button.
-        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077) {
+        // Settings key: 4077 (TCL), 83 (TCL G08 / Android 14), 176 (Settings), KEYCODE_MENU (82)
+        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077 || k == 83 || k == KeyEvent.KEYCODE_NOTIFICATION) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }
-        if (k == KeyEvent.KEYCODE_TV_INPUT) {
+        // Profile / Accounts key: 288 (TCL G08 / Android 14), 4016 (TCL), KEYCODE_PROFILE_SWITCH
+        if (k == 288 || k == 4016 || k == 303 || k == KeyEvent.KEYCODE_PROFILE_SWITCH) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
-                start(new Intent("com.android.tv.action.VIEW_INPUTS"));
+                Intent intent = new Intent(this, QuickSettingsActivity.class);
+                intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
+                startActivity(intent);
+            }
+            return true;
+        }
+        // TV / Guide key: 4001 (TCL TV button), 170 (TV), 172 (Guide), KEYCODE_TV, KEYCODE_GUIDE
+        if (k == 4001 || k == 170 || k == 172 || k == KeyEvent.KEYCODE_TV || k == KeyEvent.KEYCODE_GUIDE) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openLiveTv();
+            }
+            return true;
+        }
+        // Apps key: 174 (TCL RC833 Apps button), 284 (ALL_APPS), KEYCODE_BOOKMARK
+        if (k == 174 || k == KeyEvent.KEYCODE_BOOKMARK || k == 284 || k == KeyEvent.KEYCODE_ALL_APPS) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                selectTab(tabApps);
+                tabApps.requestFocus();
+            }
+            return true;
+        }
+        // List key: 190 (TCL RC833 List button), 4090, 4126
+        if (k == 190 || k == 4090 || k == 4126 || k == KeyEvent.KEYCODE_BUTTON_3) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openLiveTv();
+            }
+            return true;
+        }
+        if (k == KeyEvent.KEYCODE_TV_INPUT || k == 178) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openInputs();
             }
             return true;
         }

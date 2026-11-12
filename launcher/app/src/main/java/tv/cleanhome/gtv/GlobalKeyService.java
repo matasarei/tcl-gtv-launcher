@@ -19,13 +19,16 @@ public class GlobalKeyService extends AccessibilityService {
     private static final int KEYCODE_TCL_SET = 4077;
     private static final int KEYCODE_TCL_QUICK_MENU = 4020;
     private static final int KEYCODE_TCL_PROFILE = 4016;
-    private static final int KEYCODE_PROFILE_SWITCH = 303; // KeyEvent.KEYCODE_PROFILE_SWITCH (API 29)
+    private static final int KEYCODE_PROFILE_SWITCH = 288;
+    private static final int KEYCODE_PROFILE_SWITCH_LEGACY = 303;
     private static final int KEYCODE_TCL_YOUTUBE = 4065;
     private static final int KEYCODE_TCL_NETFLIX = 4062;
     private static final int KEYCODE_TCL_PRIMEVIDEO = 4099;
     private static final int KEYCODE_TCL_BROWSEHERE = 4159;
     private static final int KEYCODE_TCL_LIST = 4090;
     private static final int KEYCODE_TCL_RECORD_LIST = 4126;
+    private static final int KEYCODE_BUTTON_3 = 190;
+    private static final int KEYCODE_BOOKMARK = 174;
 
     private static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
     private static final String PKG_NETFLIX = "com.netflix.ninja";
@@ -87,6 +90,12 @@ public class GlobalKeyService extends AccessibilityService {
             return true;
         }
 
+        if (isAppsKey(code)) {
+            Log.i(TAG, "Intercepted apps key " + code + ", opening Apps tab");
+            openApps();
+            return true;
+        }
+
         if (isInputKey(code)) {
             Log.i(TAG, "Intercepted input key " + code + ", opening TV inputs");
             openTvInputs();
@@ -131,21 +140,32 @@ public class GlobalKeyService extends AccessibilityService {
         return code == KEYCODE_TCL_SET ||
                 code == 176 ||
                 code == KeyEvent.KEYCODE_SETTINGS ||
-                code == KeyEvent.KEYCODE_MENU;
+                code == KeyEvent.KEYCODE_MENU ||
+                code == 83 ||
+                code == KeyEvent.KEYCODE_NOTIFICATION;
     }
 
     private boolean isProfileKey(int code) {
         return code == KEYCODE_TCL_PROFILE ||
-                code == 288 ||
-                code == KEYCODE_PROFILE_SWITCH;
+                code == KEYCODE_PROFILE_SWITCH ||
+                code == KEYCODE_PROFILE_SWITCH_LEGACY;
     }
 
     private boolean isTvKey(int code) {
         return code == 4001 ||
                 code == 170 ||
                 code == KeyEvent.KEYCODE_TV ||
+                code == 172 ||
+                code == KeyEvent.KEYCODE_GUIDE ||
                 code == 4121 || code == 4164 ||
                 (code >= 4503 && code <= 4509);
+    }
+
+    private boolean isAppsKey(int code) {
+        return code == KEYCODE_BOOKMARK ||
+                code == KeyEvent.KEYCODE_BOOKMARK ||
+                code == 284 ||
+                code == KeyEvent.KEYCODE_ALL_APPS;
     }
 
     private boolean isInputKey(int code) {
@@ -153,7 +173,10 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private boolean isListKey(int code) {
-        return code == KEYCODE_TCL_LIST || code == KEYCODE_TCL_RECORD_LIST;
+        return code == KEYCODE_TCL_LIST ||
+                code == KEYCODE_TCL_RECORD_LIST ||
+                code == KEYCODE_BUTTON_3 ||
+                code == KeyEvent.KEYCODE_BUTTON_3;
     }
 
     private void openQuickSettings() {
@@ -166,6 +189,15 @@ public class GlobalKeyService extends AccessibilityService {
         Intent intent = new Intent(this, QuickSettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
+        try {
+            startActivity(intent);
+        } catch (Exception ignored) {}
+    }
+
+    private void openApps() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(MainActivity.EXTRA_TAB, MainActivity.TAB_APPS);
         try {
             startActivity(intent);
         } catch (Exception ignored) {}
@@ -200,11 +232,18 @@ public class GlobalKeyService extends AccessibilityService {
 
     private void openLiveTv() {
         if (!launchPackage(PKG_TV)) {
-            try {
-                Intent intent = new Intent().setClassName(PKG_TV, "com.tcl.tv.TVActivity");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            } catch (Exception ignored) {}
+            String[] tvActivities = {
+                    "com.tcl.player.TVActivity",
+                    "com.tcl.tv.TVActivity"
+            };
+            for (String act : tvActivities) {
+                try {
+                    Intent intent = new Intent().setClassName(PKG_TV, act);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    return;
+                } catch (Exception ignored) {}
+            }
         }
     }
 
