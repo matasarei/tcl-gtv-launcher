@@ -10,6 +10,8 @@ ALBUM="${2:-}"
 T=cleanyourtv/tools
 PLEZY_URL=https://github.com/edde746/plezy/releases/download/2.24.0/plezy-android-armeabi-v7a.tar.gz
 PLEZY_SHA=97e0b7696e4854a762dfff866f03cc4abcd41217715c90d60789323626dd8fae
+WALLPAPERS_URL=https://github.com/matasarei/tcl-gtv-launcher/releases/download/v1.0.0/wallpapers-1080p.tar.gz
+WALLPAPERS_SHA=63d00261c0b44a1cfd7b9f1965c4d3c3f51737b91025aeed40fde0cc75b483c9
 P(){ $T/venv/bin/python $T/tv.py "$@"; }
 step(){ printf '\n== %s\n' "$*"; }
 
@@ -43,6 +45,16 @@ if [ -z "${SKIP_DNS:-}" ]; then
   P "settings put global private_dns_mode hostname; settings put global private_dns_specifier dns.adguard-dns.com"
 else
   step "Skipping Private DNS (keeping local network DNS)"
+fi
+
+step "Download and unpack default wallpaper pack"
+C=kit/.cache; mkdir -p "$C"
+WDIR=launcher/app/src/main/res/drawable-nodpi
+mkdir -p "$WDIR"
+if [ ! -f "$WDIR/wallpaper_1.jpg" ]; then
+  [ -f "$C/wallpapers-1080p.tar.gz" ] || curl -fsSL -o "$C/wallpapers-1080p.tar.gz" "$WALLPAPERS_URL"
+  echo "$WALLPAPERS_SHA  $C/wallpapers-1080p.tar.gz" | shasum -a 256 -c
+  tar xzf "$C/wallpapers-1080p.tar.gz" -C "$WDIR"
 fi
 
 step "Build and install the launcher"

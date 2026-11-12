@@ -6,6 +6,7 @@ kit/.cache/
 launcher/.gradle/
 launcher/build/
 launcher/app/build/
+launcher/app/src/main/res/drawable-nodpi/
 launcher/local.properties
 *.apk
 .DS_Store
