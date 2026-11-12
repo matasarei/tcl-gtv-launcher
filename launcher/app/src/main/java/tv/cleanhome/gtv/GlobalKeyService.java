@@ -10,7 +10,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
 public class GlobalKeyService extends AccessibilityService {
@@ -189,21 +188,7 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private boolean isTvForeground() {
-        if (PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage)) {
-            return true;
-        }
-        try {
-            AccessibilityNodeInfo root = getRootInActiveWindow();
-            if (root != null) {
-                CharSequence pkg = root.getPackageName();
-                root.recycle();
-                if (pkg != null) {
-                    foregroundPackage = pkg.toString();
-                    return PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage);
-                }
-            }
-        } catch (Throwable ignored) {}
-        return false;
+        return PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage);
     }
 
     private void openLiveTv() {
