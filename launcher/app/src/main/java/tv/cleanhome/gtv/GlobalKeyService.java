@@ -66,13 +66,39 @@ public class GlobalKeyService extends AccessibilityService {
         Log.i(TAG, "GlobalKeyService connected: flags=" + info.flags);
     }
 
+    private boolean isHandledKey(int code) {
+        if (isListKey(code) && isTvForeground()) {
+            return false;
+        }
+        return isSettingsKey(code) ||
+                isProfileKey(code) ||
+                isTvKey(code) ||
+                isAppsKey(code) ||
+                isInputKey(code) ||
+                isListKey(code) ||
+                isYouTubeKey(code) ||
+                code == KEYCODE_TCL_NETFLIX ||
+                code == KEYCODE_TCL_PRIMEVIDEO ||
+                code == KEYCODE_TCL_BROWSEHERE ||
+                code == KeyEvent.KEYCODE_EXPLORER;
+    }
+
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         int code = event.getKeyCode();
         int action = event.getAction();
 
-        if (action != KeyEvent.ACTION_DOWN || event.getRepeatCount() > 0) {
+        if (!isHandledKey(code)) {
             return super.onKeyEvent(event);
+        }
+
+        // Always consume ACTION_UP and repeated ACTION_DOWN for handled keys so they don't leak
+        // to newly-focused overlay dialogs (such as TCL's Input QuickPanelDialog which dismisses on ACTION_UP)
+        if (action != KeyEvent.ACTION_DOWN) {
+            return true;
+        }
+        if (event.getRepeatCount() > 0) {
+            return true;
         }
 
         if (isSettingsKey(code)) {
@@ -106,10 +132,6 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isListKey(code)) {
-            if (isTvForeground()) {
-                Log.i(TAG, "TV app is foreground; delegating list key " + code + " to native TV channel list");
-                return super.onKeyEvent(event);
-            }
             Log.i(TAG, "Intercepted list key " + code + " outside TV, opening Live TV");
             openLiveTv();
             return true;
@@ -137,7 +159,7 @@ public class GlobalKeyService extends AccessibilityService {
             return true;
         }
 
-        return super.onKeyEvent(event);
+        return true;
     }
 
     private boolean isSettingsKey(int code) {
