@@ -10,8 +10,6 @@ ALBUM="${2:-}"
 T=cleanyourtv/tools
 PLEZY_URL=https://github.com/edde746/plezy/releases/download/2.24.0/plezy-android-armeabi-v7a.tar.gz
 PLEZY_SHA=97e0b7696e4854a762dfff866f03cc4abcd41217715c90d60789323626dd8fae
-WALLPAPERS_URL=https://github.com/matasarei/tcl-gtv-launcher/releases/download/v1.0.0/wallpapers-1080p.tar.gz
-WALLPAPERS_SHA=63d00261c0b44a1cfd7b9f1965c4d3c3f51737b91025aeed40fde0cc75b483c9
 P(){ $T/venv/bin/python $T/tv.py "$@"; }
 step(){ printf '\n== %s\n' "$*"; }
 
@@ -48,17 +46,30 @@ else
 fi
 
 if [ -n "${WALLPAPERS:-}" ]; then
-  step "Download and unpack default wallpaper pack (${WALLPAPERS})"
-  C=kit/.cache; mkdir -p "$C"
+  step "Download and cache wallpapers on the go (${WALLPAPERS})"
+  C=kit/.cache/wallpapers; mkdir -p "$C"
   WDIR=launcher/app/src/main/res/drawable-nodpi
   mkdir -p "$WDIR"
-  if [ ! -f "$WDIR/wallpaper_1.jpg" ]; then
-    [ -f "$C/wallpapers-1080p.tar.gz" ] || curl -fsSL -o "$C/wallpapers-1080p.tar.gz" "$WALLPAPERS_URL"
-    echo "$WALLPAPERS_SHA  $C/wallpapers-1080p.tar.gz" | shasum -a 256 -c
-    tar xzf "$C/wallpapers-1080p.tar.gz" -C "$WDIR"
-  fi
+  URLS=(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Moraine_Lake_17092005.jpg/1920px-Moraine_Lake_17092005.jpg"
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/1_pano_cuiping_yangshuo_2016.jpg/1920px-1_pano_cuiping_yangshuo_2016.jpg"
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/2015_Ribblehead_Viaduct_1.jpg/1920px-2015_Ribblehead_Viaduct_1.jpg"
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&h=1080&fit=crop"
+    "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&h=1080&fit=crop"
+  )
+  i=1
+  for url in "${URLS[@]}"; do
+    dest="$C/wallpaper_${i}.jpg"
+    if [ ! -f "$dest" ]; then
+      echo "Downloading wallpaper $i on the go..."
+      curl -fsSL -A "Mozilla/5.0" -o "$dest" "$url"
+      which sips >/dev/null 2>&1 && sips -s format jpeg -s formatOptions 70 "$dest" >/dev/null 2>&1 || true
+    fi
+    cp "$dest" "$WDIR/wallpaper_${i}.jpg"
+    i=$((i+1))
+  done
 else
-  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 or WALLPAPERS=1080p to include)"
+  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 to download and include)"
   rm -rf launcher/app/src/main/res/drawable-nodpi
 fi
 
