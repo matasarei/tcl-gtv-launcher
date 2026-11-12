@@ -20,10 +20,6 @@ This is a dedicated fork of [alexkev/tcl-gtv-launcher](https://github.com/alexke
 
 ![Home: Your apps along the bottom over wallpaper background](docs/home.jpg)
 
-| Apps Grid | Quick Settings Overlay |
-|---|---|
-| ![All apps grid with icons](docs/apps.jpg) | ![Quick Settings panel](docs/quick-settings.jpg) |
-
 ---
 
 ## Highlights of this Fork
