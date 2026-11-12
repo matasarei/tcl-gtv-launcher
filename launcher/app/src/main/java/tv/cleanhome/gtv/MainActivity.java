@@ -2,8 +2,10 @@ package tv.cleanhome.gtv;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -112,6 +114,11 @@ public class MainActivity extends Activity {
     int photoIndex;
     int defaultPhotoIndex = 0;
     boolean resumed, photosDimmed;
+    private final BroadcastReceiver refreshReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            loadPhotos();
+        }
+    };
 
     // Arrange mode for Your apps, as Google TV's Reorder: OK picks an app up, Left/Right move it, OK drops it.
     LinearLayout arrangeRow;
@@ -188,7 +195,7 @@ public class MainActivity extends Activity {
         btnScreensaver.setNextFocusLeftId(R.id.tab_apps);
         btnQuick.setNextFocusRightId(R.id.btn_quick);
         btnScreensaver.setOnClickListener(v -> startScreensaver());
-        btnQuick.setOnClickListener(v -> showQuick(true));
+        btnQuick.setOnClickListener(v -> startActivity(new Intent(this, QuickSettingsActivity.class)));
         buildQuickPanel();
         appsScroll.setOnScrollChangeListener((v, x, y, ox, oy) -> hideRowsUnderBar());
 
@@ -200,14 +207,14 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{READ_TV}, 1);
         }
         loadPhotos();
-        if (getIntent() != null && "com.tcl.dashboard.MAIN".equals(getIntent().getAction())) {
-            showQuick(true);
-        }
     }
 
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
+        try {
+            registerReceiver(refreshReceiver, new IntentFilter(QuickSettingsActivity.ACTION_REFRESH_ALBUM));
+        } catch (Throwable ignored) {}
         refreshHome();
         buildAppsGrid();
         loadWeather();
@@ -217,6 +224,9 @@ public class MainActivity extends Activity {
 
     @Override protected void onPause() {
         super.onPause();
+        try {
+            unregisterReceiver(refreshReceiver);
+        } catch (Throwable ignored) {}
         exitArrange();
         resumed = false;
         ui.removeCallbacks(weatherTick);
@@ -231,10 +241,6 @@ public class MainActivity extends Activity {
     /** Home pressed while already home: back to the top, Your apps along the bottom, focus on Home. */
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent != null && "com.tcl.dashboard.MAIN".equals(intent.getAction())) {
-            showQuick(true);
-            return;
-        }
         exitArrange();
         showQuick(false);
         selectTab(tabHome);
@@ -972,7 +978,7 @@ public class MainActivity extends Activity {
         // 4077 is TCL's proprietary OEM keycode for the remote's physical Settings button.
         if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
-                showQuick(quickPanel.getVisibility() != View.VISIBLE);
+                startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }

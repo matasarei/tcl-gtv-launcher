@@ -68,7 +68,7 @@ fi
 step "Build and install the launcher"
 (cd launcher && ./gradlew --no-daemon -q assembleRelease -PalbumUrl="$ALBUM")
 P --push launcher/app/build/outputs/apk/release/app-release.apk /data/local/tmp/gtvhome.apk
-P "pm install -r /data/local/tmp/gtvhome.apk; pm grant tv.cleanhome.gtv android.permission.READ_TV_LISTINGS; rm /data/local/tmp/gtvhome.apk"
+P "pm install -r /data/local/tmp/gtvhome.apk; pm grant tv.cleanhome.gtv android.permission.READ_TV_LISTINGS; settings put secure enabled_accessibility_services tv.cleanhome.gtv/tv.cleanhome.gtv.GlobalKeyService; settings put secure accessibility_enabled 1; rm /data/local/tmp/gtvhome.apk"
 
 if [ -n "${PLEZY:-}" ] || [ -n "${INSTALL_PLEZY:-}" ]; then
   step "Download, check and install Plezy"
