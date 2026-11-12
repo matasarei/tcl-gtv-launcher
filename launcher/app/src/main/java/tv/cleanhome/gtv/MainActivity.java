@@ -37,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -102,6 +103,9 @@ public class MainActivity extends Activity {
     final LruCache<String, Bitmap> images = new LruCache<String, Bitmap>(12 * 1024 * 1024) {
         @Override protected int sizeOf(String k, Bitmap b) { return b.getByteCount(); }
     };
+
+    public static final String EXTRA_TAB = "extra_tab";
+    public static final String TAB_APPS = "apps";
 
     PackageManager pm;
     Typeface regular, medium;
@@ -213,8 +217,13 @@ public class MainActivity extends Activity {
 
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((old, now) -> onFocusMoved(now));
 
-        selectTab(tabHome);
-        tabHome.requestFocus();
+        if (getIntent() != null && TAB_APPS.equals(getIntent().getStringExtra(EXTRA_TAB))) {
+            selectTab(tabApps);
+            tabApps.requestFocus();
+        } else {
+            selectTab(tabHome);
+            tabHome.requestFocus();
+        }
         if (checkSelfPermission(READ_TV) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_TV}, 1);
         }
@@ -261,6 +270,11 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         exitArrange();
         showQuick(false);
+        if (intent != null && TAB_APPS.equals(intent.getStringExtra(EXTRA_TAB))) {
+            selectTab(tabApps);
+            tabApps.requestFocus();
+            return;
+        }
         selectTab(tabHome);
         focusSection = -1;
         tabHome.requestFocus();
@@ -371,6 +385,12 @@ public class MainActivity extends Activity {
     }
 
     void openInputs() {
+        long now = SystemClock.uptimeMillis();
+        if (now - GlobalKeyService.lastInputOpenedTime < 1000) {
+            return;
+        }
+        GlobalKeyService.lastInputOpenedTime = now;
+
         // 1. Native TCL input sources overlay service (same as TV button)
         try {
             Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
@@ -382,10 +402,56 @@ public class MainActivity extends Activity {
         // 2. Standard Android TV input picker fallback
         Intent[] intents = new Intent[]{
                 new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent("com.tcl.suspension.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
                 new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
         };
         for (Intent intent : intents) {
             if (start(intent)) return;
+        }
+    }
+
+    void openYouTube() {
+        String[] youtubePackages = {
+                "com.google.android.youtube.tv",
+                "com.liskovsoft.videomanager",
+                "com.liskovsoft.smarttubetv.beta",
+                "com.liskovsoft.smarttubetv"
+        };
+        for (String pkg : youtubePackages) {
+            Intent intent = pm.getLeanbackLaunchIntentForPackage(pkg);
+            if (intent == null) intent = pm.getLaunchIntentForPackage(pkg);
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                if (start(intent)) return;
+            }
+        }
+        try {
+            getPackageManager().setApplicationEnabledSetting(
+                    "com.google.android.youtube.tv",
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    0);
+            Intent intent = pm.getLeanbackLaunchIntentForPackage("com.google.android.youtube.tv");
+            if (intent == null) intent = pm.getLaunchIntentForPackage("com.google.android.youtube.tv");
+            if (intent != null && start(intent)) return;
+        } catch (Exception ignored) {}
+    }
+
+    void openLiveTv() {
+        Intent intent = pm.getLeanbackLaunchIntentForPackage("com.tcl.tv");
+        if (intent == null) intent = pm.getLaunchIntentForPackage("com.tcl.tv");
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            if (start(intent)) return;
+        }
+        String[] tvActivities = {
+                "com.tcl.player.TVActivity",
+                "com.tcl.tv.TVActivity"
+        };
+        for (String act : tvActivities) {
+            Intent actIntent = new Intent().setClassName("com.tcl.tv", act);
+            actIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (start(actIntent)) return;
         }
     }
 
@@ -1103,16 +1169,48 @@ public class MainActivity extends Activity {
 
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
-        // 4077 is TCL's proprietary OEM keycode for the remote's physical Settings button.
-        if (k == KeyEvent.KEYCODE_SETTINGS || k == KeyEvent.KEYCODE_MENU || k == 4077) {
+        if (GlobalKeyService.isSettingsKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
                 startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }
-        if (k == KeyEvent.KEYCODE_TV_INPUT) {
+        if (GlobalKeyService.isProfileKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN) {
-                start(new Intent("com.android.tv.action.VIEW_INPUTS"));
+                Intent intent = new Intent(this, QuickSettingsActivity.class);
+                intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
+                startActivity(intent);
+            }
+            return true;
+        }
+        if (GlobalKeyService.isTvKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openLiveTv();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isAppsKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                selectTab(tabApps);
+                tabApps.requestFocus();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isYouTubeKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openYouTube();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isListKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openLiveTv();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isInputKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+                openInputs();
             }
             return true;
         }

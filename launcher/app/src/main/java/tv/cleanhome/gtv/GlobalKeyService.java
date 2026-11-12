@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,19 +20,24 @@ public class GlobalKeyService extends AccessibilityService {
     private static final int KEYCODE_TCL_SET = 4077;
     private static final int KEYCODE_TCL_QUICK_MENU = 4020;
     private static final int KEYCODE_TCL_PROFILE = 4016;
-    private static final int KEYCODE_PROFILE_SWITCH = 303; // KeyEvent.KEYCODE_PROFILE_SWITCH (API 29)
+    private static final int KEYCODE_PROFILE_SWITCH = 288;
+    private static final int KEYCODE_PROFILE_SWITCH_LEGACY = 303;
     private static final int KEYCODE_TCL_YOUTUBE = 4065;
     private static final int KEYCODE_TCL_NETFLIX = 4062;
     private static final int KEYCODE_TCL_PRIMEVIDEO = 4099;
     private static final int KEYCODE_TCL_BROWSEHERE = 4159;
     private static final int KEYCODE_TCL_LIST = 4090;
     private static final int KEYCODE_TCL_RECORD_LIST = 4126;
+    private static final int KEYCODE_BUTTON_3 = 190;
+    private static final int KEYCODE_BOOKMARK = 174;
 
     private static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
     private static final String PKG_NETFLIX = "com.netflix.ninja";
     private static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
     private static final String PKG_TV = "com.tcl.tv";
     private static final String PKG_TV_INPUT = "com.tcl.tvinput";
+
+    public static volatile long lastInputOpenedTime = 0;
 
     private volatile String foregroundPackage = null;
 
@@ -60,13 +66,43 @@ public class GlobalKeyService extends AccessibilityService {
         Log.i(TAG, "GlobalKeyService connected: flags=" + info.flags);
     }
 
+    static boolean isHandledKey(int code, boolean isTvForeground) {
+        if (isListKey(code) && isTvForeground) {
+            return false;
+        }
+        return isSettingsKey(code) ||
+                isProfileKey(code) ||
+                isTvKey(code) ||
+                isAppsKey(code) ||
+                isInputKey(code) ||
+                isListKey(code) ||
+                isYouTubeKey(code) ||
+                code == KEYCODE_TCL_NETFLIX ||
+                code == KEYCODE_TCL_PRIMEVIDEO ||
+                code == KEYCODE_TCL_BROWSEHERE ||
+                code == KeyEvent.KEYCODE_EXPLORER;
+    }
+
+    private boolean isHandledKey(int code) {
+        return isHandledKey(code, isTvForeground());
+    }
+
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         int code = event.getKeyCode();
         int action = event.getAction();
 
-        if (action != KeyEvent.ACTION_DOWN || event.getRepeatCount() > 0) {
+        if (!isHandledKey(code)) {
             return super.onKeyEvent(event);
+        }
+
+        // Always consume ACTION_UP and repeated ACTION_DOWN for handled keys so they don't leak
+        // to newly-focused overlay dialogs (such as TCL's Input QuickPanelDialog which dismisses on ACTION_UP)
+        if (action != KeyEvent.ACTION_DOWN) {
+            return true;
+        }
+        if (event.getRepeatCount() > 0) {
+            return true;
         }
 
         if (isSettingsKey(code)) {
@@ -87,6 +123,12 @@ public class GlobalKeyService extends AccessibilityService {
             return true;
         }
 
+        if (isAppsKey(code)) {
+            Log.i(TAG, "Intercepted apps key " + code + ", opening Apps tab");
+            openApps();
+            return true;
+        }
+
         if (isInputKey(code)) {
             Log.i(TAG, "Intercepted input key " + code + ", opening TV inputs");
             openTvInputs();
@@ -94,18 +136,15 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isListKey(code)) {
-            if (isTvForeground()) {
-                Log.i(TAG, "TV app is foreground; delegating list key " + code + " to native TV channel list");
-                return super.onKeyEvent(event);
-            }
             Log.i(TAG, "Intercepted list key " + code + " outside TV, opening Live TV");
             openLiveTv();
             return true;
         }
 
-        if (code == KEYCODE_TCL_YOUTUBE) {
+        if (isYouTubeKey(code)) {
             Log.i(TAG, "Intercepted YouTube key " + code);
-            if (launchPackage(PKG_YOUTUBE)) return true;
+            openYouTube();
+            return true;
         }
 
         if (code == KEYCODE_TCL_NETFLIX) {
@@ -124,36 +163,54 @@ public class GlobalKeyService extends AccessibilityService {
             return true;
         }
 
-        return super.onKeyEvent(event);
+        return true;
     }
 
-    private boolean isSettingsKey(int code) {
+    static boolean isSettingsKey(int code) {
         return code == KEYCODE_TCL_SET ||
                 code == 176 ||
                 code == KeyEvent.KEYCODE_SETTINGS ||
-                code == KeyEvent.KEYCODE_MENU;
+                code == KeyEvent.KEYCODE_MENU ||
+                code == 83 ||
+                code == KeyEvent.KEYCODE_NOTIFICATION;
     }
 
-    private boolean isProfileKey(int code) {
+    static boolean isProfileKey(int code) {
         return code == KEYCODE_TCL_PROFILE ||
-                code == 288 ||
-                code == KEYCODE_PROFILE_SWITCH;
+                code == KEYCODE_PROFILE_SWITCH ||
+                code == KEYCODE_PROFILE_SWITCH_LEGACY;
     }
 
-    private boolean isTvKey(int code) {
+    static boolean isTvKey(int code) {
         return code == 4001 ||
                 code == 170 ||
                 code == KeyEvent.KEYCODE_TV ||
+                code == 172 ||
+                code == KeyEvent.KEYCODE_GUIDE ||
                 code == 4121 || code == 4164 ||
                 (code >= 4503 && code <= 4509);
     }
 
-    private boolean isInputKey(int code) {
+    static boolean isAppsKey(int code) {
+        return code == KEYCODE_BOOKMARK ||
+                code == KeyEvent.KEYCODE_BOOKMARK ||
+                code == 284 ||
+                code == KeyEvent.KEYCODE_ALL_APPS;
+    }
+
+    static boolean isInputKey(int code) {
         return code == 178 || code == KeyEvent.KEYCODE_TV_INPUT;
     }
 
-    private boolean isListKey(int code) {
-        return code == KEYCODE_TCL_LIST || code == KEYCODE_TCL_RECORD_LIST;
+    static boolean isYouTubeKey(int code) {
+        return code == KEYCODE_TCL_YOUTUBE ||
+                code == KEYCODE_BUTTON_3 ||
+                code == KeyEvent.KEYCODE_BUTTON_3;
+    }
+
+    static boolean isListKey(int code) {
+        return code == KEYCODE_TCL_LIST ||
+                code == KEYCODE_TCL_RECORD_LIST;
     }
 
     private void openQuickSettings() {
@@ -171,7 +228,23 @@ public class GlobalKeyService extends AccessibilityService {
         } catch (Exception ignored) {}
     }
 
+    private void openApps() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(MainActivity.EXTRA_TAB, MainActivity.TAB_APPS);
+        try {
+            startActivity(intent);
+        } catch (Exception ignored) {}
+    }
+
     private void openTvInputs() {
+        long now = SystemClock.uptimeMillis();
+        if (now - lastInputOpenedTime < 1000) {
+            Log.i(TAG, "Debouncing TV inputs launch");
+            return;
+        }
+        lastInputOpenedTime = now;
+
         // 1. Native TCL input sources overlay service (proven to show input selector)
         try {
             Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
@@ -183,6 +256,8 @@ public class GlobalKeyService extends AccessibilityService {
         // 2. Standard Android TV input picker
         Intent[] intents = new Intent[]{
                 new Intent("com.android.tv.action.VIEW_INPUTS"),
+                new Intent("com.tcl.suspension.VIEW_INPUTS"),
+                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
                 new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
         };
         for (Intent intent : intents) {
@@ -194,17 +269,43 @@ public class GlobalKeyService extends AccessibilityService {
         }
     }
 
+    private void openYouTube() {
+        String[] youtubePackages = {
+                PKG_YOUTUBE,
+                "com.liskovsoft.videomanager",
+                "com.liskovsoft.smarttubetv.beta",
+                "com.liskovsoft.smarttubetv"
+        };
+        for (String pkg : youtubePackages) {
+            if (launchPackage(pkg)) return;
+        }
+        try {
+            getPackageManager().setApplicationEnabledSetting(
+                    PKG_YOUTUBE,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    0);
+            if (launchPackage(PKG_YOUTUBE)) return;
+        } catch (Exception ignored) {}
+    }
+
     private boolean isTvForeground() {
         return PKG_TV.equals(foregroundPackage) || PKG_TV_INPUT.equals(foregroundPackage);
     }
 
     private void openLiveTv() {
         if (!launchPackage(PKG_TV)) {
-            try {
-                Intent intent = new Intent().setClassName(PKG_TV, "com.tcl.tv.TVActivity");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            } catch (Exception ignored) {}
+            String[] tvActivities = {
+                    "com.tcl.player.TVActivity",
+                    "com.tcl.tv.TVActivity"
+            };
+            for (String act : tvActivities) {
+                try {
+                    Intent intent = new Intent().setClassName(PKG_TV, act);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    return;
+                } catch (Exception ignored) {}
+            }
         }
     }
 
