@@ -31,7 +31,7 @@ public class GlobalKeyService extends AccessibilityService {
     private static final int KEYCODE_BUTTON_3 = 190;
     private static final int KEYCODE_BOOKMARK = 174;
 
-    private static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
+    private static final String PKG_YOUTUBE = LaunchHelper.PKG_YOUTUBE;
     private static final String PKG_NETFLIX = "com.netflix.ninja";
     private static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
     private static final String PKG_TV = "com.tcl.tv";
@@ -238,54 +238,13 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openTvInputs() {
-        long now = SystemClock.uptimeMillis();
-        if (now - lastInputOpenedTime < 1000) {
-            Log.i(TAG, "Debouncing TV inputs launch");
-            return;
-        }
-        lastInputOpenedTime = now;
-
-        // 1. Native TCL input sources overlay service (proven to show input selector)
-        try {
-            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
-            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
-            ComponentName cn = startService(serviceIntent);
-            if (cn != null) return;
-        } catch (Exception ignored) {}
-
-        // 2. Standard Android TV input picker
-        Intent[] intents = new Intent[]{
-                new Intent("com.android.tv.action.VIEW_INPUTS"),
-                new Intent("com.tcl.suspension.VIEW_INPUTS"),
-                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
-                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
-        };
-        for (Intent intent : intents) {
-            try {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return;
-            } catch (Exception ignored) {}
-        }
+        LaunchHelper.openInputs(this);
     }
 
     private void openYouTube() {
-        String[] youtubePackages = {
-                PKG_YOUTUBE,
-                "com.liskovsoft.videomanager",
-                "com.liskovsoft.smarttubetv.beta",
-                "com.liskovsoft.smarttubetv"
-        };
-        for (String pkg : youtubePackages) {
-            if (launchPackage(pkg)) return;
+        if (!LaunchHelper.openYouTube(this)) {
+            Toast.makeText(this, PKG_YOUTUBE + " is not installed", Toast.LENGTH_SHORT).show();
         }
-        try {
-            getPackageManager().setApplicationEnabledSetting(
-                    PKG_YOUTUBE,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    0);
-            if (launchPackage(PKG_YOUTUBE)) return;
-        } catch (Exception ignored) {}
     }
 
     private boolean isTvForeground() {
@@ -293,31 +252,11 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openLiveTv() {
-        if (!launchPackage(PKG_TV)) {
-            String[] tvActivities = {
-                    "com.tcl.player.TVActivity",
-                    "com.tcl.tv.TVActivity"
-            };
-            for (String act : tvActivities) {
-                try {
-                    Intent intent = new Intent().setClassName(PKG_TV, act);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    return;
-                } catch (Exception ignored) {}
-            }
-        }
+        LaunchHelper.openLiveTv(this);
     }
 
     private boolean launchPackage(String packageName) {
-        PackageManager pm = getPackageManager();
-        Intent intent = pm.getLeanbackLaunchIntentForPackage(packageName);
-        if (intent == null) {
-            intent = pm.getLaunchIntentForPackage(packageName);
-        }
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivity(intent);
+        if (LaunchHelper.launchPackage(this, packageName)) {
             return true;
         }
         Toast.makeText(this, packageName + " is not installed", Toast.LENGTH_SHORT).show();

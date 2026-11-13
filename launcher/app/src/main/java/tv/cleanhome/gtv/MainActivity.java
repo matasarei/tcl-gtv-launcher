@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
     TextView weather, tooltip;
     View selectedTab;
     ImageView tabHome, tabApps, btnInputs, btnScreensaver, btnQuick;
-    View topBar, navPill, content, quickPanel, allSettings;
+    View topBar, navPill, content;
     ImageView photoA, photoB, currentPhoto;
     CenterScroll homeScroll;
     ScrollView appsScroll;
@@ -179,8 +179,6 @@ public class MainActivity extends Activity {
         topBar = findViewById(R.id.top_bar);
         navPill = findViewById(R.id.nav_pill);
         content = findViewById(R.id.content);
-        quickPanel = findViewById(R.id.quick_panel);
-        allSettings = findViewById(R.id.all_settings);
         photoA = findViewById(R.id.photo_a);
         photoB = findViewById(R.id.photo_b);
         homeScroll = findViewById(R.id.home_scroll);
@@ -192,7 +190,6 @@ public class MainActivity extends Activity {
         tooltip.setTypeface(medium);
         navPill.setBackground(round(PILL, dp(22)));
         findViewById(R.id.action_pill).setBackground(round(PILL, dp(22)));
-        quickPanel.setBackground(round(PANEL, dp(20)));
         GradientDrawable scrim = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                 new int[]{0xB30D1013, 0x000D1013, 0x400D1013, 0xE60D1013});
         findViewById(R.id.scrim).setBackground(scrim);
@@ -212,7 +209,6 @@ public class MainActivity extends Activity {
         btnInputs.setOnClickListener(v -> openInputs());
         btnScreensaver.setOnClickListener(v -> startScreensaver());
         btnQuick.setOnClickListener(v -> startActivity(new Intent(this, QuickSettingsActivity.class)));
-        buildQuickPanel();
         appsScroll.setOnScrollChangeListener((v, x, y, ox, oy) -> hideRowsUnderBar());
 
         getWindow().getDecorView().getViewTreeObserver().addOnGlobalFocusChangeListener((old, now) -> onFocusMoved(now));
@@ -227,6 +223,7 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(READ_TV) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_TV}, 1);
         }
+        ensureAccessibilityServiceEnabled();
         loadPhotos();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -245,11 +242,26 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
+        ensureAccessibilityServiceEnabled();
         refreshHome();
         buildAppsGrid();
         loadWeather();
         ui.removeCallbacks(photoTick);
         ui.postDelayed(photoTick, photoDelay());
+    }
+
+    void ensureAccessibilityServiceEnabled() {
+        try {
+            String enabledServices = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            String myService = getPackageName() + "/" + GlobalKeyService.class.getName();
+            if (enabledServices == null || !enabledServices.contains(myService)) {
+                String updated = (enabledServices == null || enabledServices.isEmpty())
+                        ? myService
+                        : enabledServices + ":" + myService;
+                Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, updated);
+                Settings.Secure.putInt(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+            }
+        } catch (Throwable ignored) {}
     }
 
     @Override protected void onPause() {
@@ -269,7 +281,6 @@ public class MainActivity extends Activity {
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         exitArrange();
-        showQuick(false);
         if (intent != null && TAB_APPS.equals(intent.getStringExtra(EXTRA_TAB))) {
             selectTab(tabApps);
             tabApps.requestFocus();
@@ -283,7 +294,6 @@ public class MainActivity extends Activity {
 
     @Override public void onBackPressed() {
         if (arrangeRow != null) exitArrange();
-        else if (quickPanel.getVisibility() == View.VISIBLE) showQuick(false);
         else if (selectedTab == tabApps || inside(getCurrentFocus(), homeRows)) tabHome.requestFocus();
         // Otherwise stay: this is Home.
     }
@@ -296,7 +306,7 @@ public class MainActivity extends Activity {
         boolean action = now == tabHome || now == tabApps || now == btnInputs || now == btnScreensaver || now == btnQuick;
         if (action) showTooltip(now);
         else tooltip.setVisibility(View.INVISIBLE);
-        if (quickPanel.getVisibility() != View.VISIBLE) content.setAlpha(now == btnInputs || now == btnScreensaver || now == btnQuick ? 0.35f : 1f);
+        content.setAlpha(now == btnInputs || now == btnScreensaver || now == btnQuick ? 0.35f : 1f);
         if (now == null || selectedTab != tabHome) return;
         if (inside(now, homeRows)) {
             LinearLayout section = sectionOf(now);
@@ -385,182 +395,19 @@ public class MainActivity extends Activity {
     }
 
     void openInputs() {
-        long now = SystemClock.uptimeMillis();
-        if (now - GlobalKeyService.lastInputOpenedTime < 1000) {
-            return;
-        }
-        GlobalKeyService.lastInputOpenedTime = now;
-
-        // 1. Native TCL input sources overlay service (same as TV button)
-        try {
-            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
-            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
-            ComponentName cn = startService(serviceIntent);
-            if (cn != null) return;
-        } catch (Exception ignored) {}
-
-        // 2. Standard Android TV input picker fallback
-        Intent[] intents = new Intent[]{
-                new Intent("com.android.tv.action.VIEW_INPUTS"),
-                new Intent("com.tcl.suspension.VIEW_INPUTS"),
-                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
-                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
-        };
-        for (Intent intent : intents) {
-            if (start(intent)) return;
-        }
+        LaunchHelper.openInputs(this);
     }
 
     void openYouTube() {
-        String[] youtubePackages = {
-                "com.google.android.youtube.tv",
-                "com.liskovsoft.videomanager",
-                "com.liskovsoft.smarttubetv.beta",
-                "com.liskovsoft.smarttubetv"
-        };
-        for (String pkg : youtubePackages) {
-            Intent intent = pm.getLeanbackLaunchIntentForPackage(pkg);
-            if (intent == null) intent = pm.getLaunchIntentForPackage(pkg);
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                if (start(intent)) return;
-            }
-        }
-        try {
-            getPackageManager().setApplicationEnabledSetting(
-                    "com.google.android.youtube.tv",
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    0);
-            Intent intent = pm.getLeanbackLaunchIntentForPackage("com.google.android.youtube.tv");
-            if (intent == null) intent = pm.getLaunchIntentForPackage("com.google.android.youtube.tv");
-            if (intent != null && start(intent)) return;
-        } catch (Exception ignored) {}
+        LaunchHelper.openYouTube(this);
     }
 
     void openLiveTv() {
-        Intent intent = pm.getLeanbackLaunchIntentForPackage("com.tcl.tv");
-        if (intent == null) intent = pm.getLaunchIntentForPackage("com.tcl.tv");
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            if (start(intent)) return;
-        }
-        String[] tvActivities = {
-                "com.tcl.player.TVActivity",
-                "com.tcl.tv.TVActivity"
-        };
-        for (String act : tvActivities) {
-            Intent actIntent = new Intent().setClassName("com.tcl.tv", act);
-            actIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (start(actIntent)) return;
-        }
+        LaunchHelper.openLiveTv(this);
     }
 
     void startScreensaver() {
-        // The stock dream (Google's dreamx Backdrop on Google TV), started now, as Settings' "Start now" does.
-        Intent dream = new Intent(Intent.ACTION_MAIN)
-                .setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
-        if (!start(dream)) start(new Intent(Settings.ACTION_DREAM_SETTINGS));
-    }
-
-    // ---- quick settings ----
-
-    void buildQuickPanel() {
-        ImageView gear = findViewById(R.id.all_settings_icon);
-        gear.setBackground(oval(TILE));
-        gear.setImageTintList(ColorStateList.valueOf(WHITE));
-        allSettings.setOnFocusChangeListener((v, has) -> {
-            gear.setBackground(oval(has ? TILE_FOCUS : TILE));
-            gear.setImageTintList(ColorStateList.valueOf(has ? DARK_TEXT : WHITE));
-        });
-        allSettings.setOnClickListener(v -> { if (start(new Intent(Settings.ACTION_SETTINGS))) showQuick(false); });
-
-        LinearLayout tiles = findViewById(R.id.quick_tiles);
-        Object[][] entries = {
-                {"Apps", R.drawable.ic_apps, new Intent[]{
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
-                        new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
-                {"Inputs", R.drawable.ic_input, new Intent[]{new Intent("com.android.tv.action.VIEW_INPUTS")}},
-                {"Picture", R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
-                {"Network", R.drawable.ic_ethernet, new Intent[]{
-                        new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
-                        new Intent(Settings.ACTION_WIRELESS_SETTINGS)}},
-                {"Remotes", R.drawable.ic_bluetooth, new Intent[]{
-                        new Intent().setClassName("com.android.tv.settings", "com.tcl.android.tv.settings.accessories.AccessoriesActivity"),
-                        new Intent("android.settings.BLUETOOTH_SETTINGS")}},
-                {"Accessibility", R.drawable.ic_accessibility, new Intent[]{
-                        new Intent("android.settings.ACCESSIBILITY_TV_OEM_LINK"),
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
-                        new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
-                {"Screensaver", R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
-                {"Refresh album", R.drawable.ic_refresh, (Runnable) this::loadPhotos},
-        };
-        LinearLayout row = null;
-        for (int i = 0; i < entries.length; i++) {
-            if (i % 2 == 0) {
-                row = new LinearLayout(this);
-                tiles.addView(row, new LinearLayout.LayoutParams(-1, -2));
-            }
-            LinearLayout tile = new LinearLayout(this);
-            tile.setGravity(Gravity.CENTER_VERTICAL);
-            tile.setPadding(dp(12), 0, dp(6), 0);
-            tile.setFocusable(true);
-            tile.setClickable(true);
-            tile.setBackground(round(TILE, dp(14)));
-            ImageView icon = new ImageView(this);
-            icon.setImageResource((Integer) entries[i][1]);
-            icon.setImageTintList(ColorStateList.valueOf(WHITE));
-            tile.addView(icon, new LinearLayout.LayoutParams(dp(18), dp(18)));
-            TextView label = caption((String) entries[i][0], 13, WHITE);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
-            lp.leftMargin = dp(8);
-            tile.addView(label, lp);
-            tile.setOnFocusChangeListener((v, has) -> {
-                v.setBackground(round(has ? TILE_FOCUS : TILE, dp(14)));
-                icon.setImageTintList(ColorStateList.valueOf(has ? DARK_TEXT : WHITE));
-                label.setTextColor(has ? DARK_TEXT : WHITE);
-            });
-            final Object action = entries[i][2];
-            tile.setOnClickListener(v -> {
-                if (action instanceof Runnable) { ((Runnable) action).run(); showQuick(false); return; }
-                for (Intent in : (Intent[]) action) if (start(in)) { showQuick(false); return; }
-            });
-            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0, dp(54), 1);
-            tp.setMargins(0, 0, i % 2 == 0 ? dp(6) : 0, dp(6));
-            row.addView(tile, tp);
-            if (i == entries.length - 1 && i % 2 == 0) row.addView(new View(this), new LinearLayout.LayoutParams(0, 1, 1));
-        }
-    }
-
-    /** Slides in from the right edge and dims the rest, like Google TV's panel. */
-    void showQuick(boolean show) {
-        boolean open = quickPanel.getVisibility() == View.VISIBLE;
-        if (show == open) return;
-        int block = show ? ViewGroup.FOCUS_BLOCK_DESCENDANTS : ViewGroup.FOCUS_AFTER_DESCENDANTS;
-        ((ViewGroup) topBar).setDescendantFocusability(block);
-        ((ViewGroup) content).setDescendantFocusability(block);
-        float away = quickPanel.getWidth() > 0 ? quickPanel.getWidth() + dp(16) : dp(300);
-        quickPanel.animate().cancel();
-        if (show) {
-            quickPanel.setVisibility(View.VISIBLE);
-            quickPanel.setTranslationX(away);
-            quickPanel.setAlpha(0f);
-            quickPanel.animate().translationX(0).alpha(1f).setDuration(280)
-                    .setInterpolator(new DecelerateInterpolator(2f)).start();
-            fade(content, 0.3f);
-            fade(topBar, 0.3f);
-            LinearLayout tiles = findViewById(R.id.quick_tiles);
-            View firstTile = tiles.getChildCount() > 0 && ((ViewGroup) tiles.getChildAt(0)).getChildCount() > 0
-                    ? ((ViewGroup) tiles.getChildAt(0)).getChildAt(0) : allSettings;
-            firstTile.requestFocus();
-        } else {
-            quickPanel.animate().translationX(away).alpha(0f).setDuration(200)
-                    .setInterpolator(new DecelerateInterpolator())
-                    .withEndAction(() -> quickPanel.setVisibility(View.GONE)).start();
-            fade(content, 1f);
-            fade(topBar, 1f);
-            btnQuick.requestFocus();
-        }
+        LaunchHelper.startScreensaver(this);
     }
 
     static void fade(View v, float to) {
@@ -1170,13 +1017,13 @@ public class MainActivity extends Activity {
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
         if (GlobalKeyService.isSettingsKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }
         if (GlobalKeyService.isProfileKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 Intent intent = new Intent(this, QuickSettingsActivity.class);
                 intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
                 startActivity(intent);
@@ -1184,32 +1031,32 @@ public class MainActivity extends Activity {
             return true;
         }
         if (GlobalKeyService.isTvKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openLiveTv();
             }
             return true;
         }
         if (GlobalKeyService.isAppsKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 selectTab(tabApps);
                 tabApps.requestFocus();
             }
             return true;
         }
         if (GlobalKeyService.isYouTubeKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openYouTube();
             }
             return true;
         }
         if (GlobalKeyService.isListKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openLiveTv();
             }
             return true;
         }
         if (GlobalKeyService.isInputKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openInputs();
             }
             return true;
@@ -1485,7 +1332,7 @@ public class MainActivity extends Activity {
     }
 
     void restoreFocus() {
-        if (selectedTab == tabApps || quickPanel.getVisibility() == View.VISIBLE) return;
+        if (selectedTab == tabApps) return;
         if (focusSection > 0 && focusSection < homeRows.getChildCount()
                 && homeRows.getChildAt(focusSection).getTag() instanceof List) {
             ViewGroup row = rowOf(homeRows.getChildAt(focusSection));

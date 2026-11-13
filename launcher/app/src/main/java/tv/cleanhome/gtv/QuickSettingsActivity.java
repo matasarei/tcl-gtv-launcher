@@ -66,9 +66,8 @@ public class QuickSettingsActivity extends Activity {
             allSettingsIcon.setImageTintList(ColorStateList.valueOf(has ? DARK_TEXT : WHITE));
         });
         allSettings.setOnClickListener(v -> {
-            if (start(new Intent(Settings.ACTION_SETTINGS))) {
-                dismiss();
-            }
+            LaunchHelper.openSettings(this);
+            dismiss();
         });
 
         root.setOnClickListener(v -> dismiss());
@@ -102,26 +101,14 @@ public class QuickSettingsActivity extends Activity {
         tiles.removeAllViews();
         String[] tags = {"Apps", "Accounts", "Inputs", "Picture", "Network", "Remotes", "Accessibility", "Screensaver", "Refresh album"};
         Object[][] entries = {
-                {getString(R.string.tile_apps), R.drawable.ic_apps, new Intent[]{
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AllAppsActivity"),
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
-                        new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
-                {getString(R.string.tile_accounts), R.drawable.ic_account, new Intent[]{
-                        new Intent(Settings.ACTION_SETTINGS),
-                        new Intent(Settings.ACTION_ADD_ACCOUNT)}},
-                {getString(R.string.tile_inputs), R.drawable.ic_input, (Runnable) this::openInputs},
-                {getString(R.string.tile_picture), R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
-                {getString(R.string.tile_network), R.drawable.ic_ethernet, new Intent[]{
-                        new Intent("com.tcl.settings.action.NETWORKSETTINGS"),
-                        new Intent(Settings.ACTION_WIRELESS_SETTINGS)}},
-                {getString(R.string.tile_remotes), R.drawable.ic_bluetooth, new Intent[]{
-                        new Intent().setClassName("com.android.tv.settings", "com.tcl.android.tv.settings.accessories.AccessoriesActivity"),
-                        new Intent("android.settings.BLUETOOTH_SETTINGS")}},
-                {getString(R.string.tile_accessibility), R.drawable.ic_accessibility, new Intent[]{
-                        new Intent("android.settings.ACCESSIBILITY_TV_OEM_LINK"),
-                        new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
-                        new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
-                {getString(R.string.tile_screensaver), R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
+                {getString(R.string.tile_apps), R.drawable.ic_apps, (Runnable) () -> LaunchHelper.openAppsSettings(this)},
+                {getString(R.string.tile_accounts), R.drawable.ic_account, (Runnable) () -> LaunchHelper.openAccounts(this)},
+                {getString(R.string.tile_inputs), R.drawable.ic_input, (Runnable) () -> LaunchHelper.openInputs(this)},
+                {getString(R.string.tile_picture), R.drawable.ic_picture, (Runnable) () -> LaunchHelper.openPictureSettings(this)},
+                {getString(R.string.tile_network), R.drawable.ic_ethernet, (Runnable) () -> LaunchHelper.openNetworkSettings(this)},
+                {getString(R.string.tile_remotes), R.drawable.ic_bluetooth, (Runnable) () -> LaunchHelper.openRemotesSettings(this)},
+                {getString(R.string.tile_accessibility), R.drawable.ic_accessibility, (Runnable) () -> LaunchHelper.openAccessibilitySettings(this)},
+                {getString(R.string.tile_screensaver), R.drawable.ic_frame, (Runnable) () -> LaunchHelper.startScreensaver(this)},
                 {getString(R.string.tile_refresh_album), R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM).setPackage(getPackageName()))},
         };
 
@@ -155,19 +142,10 @@ public class QuickSettingsActivity extends Activity {
                 label.setTextColor(has ? DARK_TEXT : WHITE);
             });
 
-            final Object action = entries[i][2];
+            final Runnable action = (Runnable) entries[i][2];
             tile.setOnClickListener(v -> {
-                if (action instanceof Runnable) {
-                    ((Runnable) action).run();
-                    dismiss();
-                    return;
-                }
-                for (Intent in : (Intent[]) action) {
-                    if (start(in)) {
-                        dismiss();
-                        return;
-                    }
-                }
+                action.run();
+                dismiss();
             });
 
             LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0, dp(54), 1);
@@ -225,33 +203,7 @@ public class QuickSettingsActivity extends Activity {
         dismiss();
     }
 
-    private void openInputs() {
-        try {
-            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
-            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
-            ComponentName cn = startService(serviceIntent);
-            if (cn != null) return;
-        } catch (Exception ignored) {}
 
-        Intent[] intents = new Intent[]{
-                new Intent("com.android.tv.action.VIEW_INPUTS"),
-                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
-        };
-        for (Intent intent : intents) {
-            if (start(intent)) return;
-        }
-    }
-
-    private boolean start(Intent in) {
-        try {
-            in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(in);
-            return true;
-        } catch (Throwable t) {
-            Log.w(TAG, "Cannot launch " + in + ": " + t);
-            return false;
-        }
-    }
 
     private TextView caption(String text, int sp, int color) {
         TextView t = new TextView(this);
