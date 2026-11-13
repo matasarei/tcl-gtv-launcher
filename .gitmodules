@@ -1,6 +1,3 @@
 [submodule "cleanyourtv"]
 	path = cleanyourtv
 	url = https://github.com/Gathin23/cleanyourtv
-[submodule "wallpapers"]
-	path = wallpapers
-	url = https://github.com/matasarei/gtv-wallpapers.git

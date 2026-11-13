@@ -45,25 +45,7 @@ else
   step "Skipping Private DNS (keeping local network DNS; set ADGUARD_DNS=1 to enable)"
 fi
 
-if [ -n "${WALLPAPERS:-}" ]; then
-  step "Prepare wallpapers from submodule (${WALLPAPERS})"
-  [ -d wallpapers/1080p ] || git submodule update --init wallpapers
-  WDIR=launcher/app/src/main/res/drawable-nodpi
-  mkdir -p "$WDIR"
-  case "$WALLPAPERS" in
-    4k|4K)
-      SRC_DIR=wallpapers/4k
-      [ -d "$SRC_DIR" ] || SRC_DIR=wallpapers/1080p
-      ;;
-    *)
-      SRC_DIR=wallpapers/1080p
-      ;;
-  esac
-  cp "$SRC_DIR"/wallpaper_*.jpg "$WDIR/"
-else
-  step "Skipping wallpaper pack (clean dark theme; set WALLPAPERS=1 to include submodule wallpapers)"
-  rm -rf launcher/app/src/main/res/drawable-nodpi
-fi
+step "Using bundled default wallpapers"
 
 step "Build and install the launcher"
 (cd launcher && ./gradlew --no-daemon -q assembleRelease -PalbumUrl="$ALBUM")
