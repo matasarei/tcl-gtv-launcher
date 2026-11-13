@@ -53,24 +53,14 @@ public class LaunchHelperUnitTest {
 
     @Test
     public void testInputsTargetsCoverage() {
-        // Services
-        IntentTarget[] services = LaunchHelper.INPUTS_SERVICES;
-        assertNotNull(services);
-        assertTrue("Must contain both Android 14 and Android 11 TCL input services", services.length >= 2);
-        assertTrue("Must contain Android 14 TCL player ShowWindowService",
-                containsComponent(services, "com.tcl.tv", "com.tcl.player.service.ShowWindowService"));
-        assertTrue("Must contain Android 11 TCL sourcemenu ShowWindowService",
-                containsComponent(services, "com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService"));
-
-        // Activities
-        IntentTarget[] activities = LaunchHelper.INPUTS_ACTIVITIES;
-        assertNotNull(activities);
+        IntentTarget[] targets = LaunchHelper.INPUTS_TARGETS;
+        assertNotNull(targets);
         assertTrue("Must contain Android TV standard VIEW_INPUTS",
-                containsAction(activities, "com.android.tv.action.VIEW_INPUTS"));
+                containsAction(targets, "com.android.tv.action.VIEW_INPUTS"));
         assertTrue("Must contain TV2 Quick_Panel InputActivity",
-                containsComponent(activities, "com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"));
+                containsComponent(targets, "com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"));
         assertTrue("Must contain TV1 tvinput MainActivity",
-                containsComponent(activities, "com.tcl.tvinput", "com.tcl.tvinput.MainActivity"));
+                containsComponent(targets, "com.tcl.tvinput", "com.tcl.tvinput.MainActivity"));
     }
 
     @Test

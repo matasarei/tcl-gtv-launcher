@@ -130,8 +130,7 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isInputKey(code)) {
-            Log.i(TAG, "Intercepted input key " + code + ", opening TV inputs");
-            openTvInputs();
+            Log.i(TAG, "Intercepted input key " + code + ", TV system handles QuickPanel inputs natively");
             return true;
         }
 
@@ -235,10 +234,6 @@ public class GlobalKeyService extends AccessibilityService {
         try {
             startActivity(intent);
         } catch (Exception ignored) {}
-    }
-
-    private void openTvInputs() {
-        LaunchHelper.openInputs(this);
     }
 
     private void openYouTube() {

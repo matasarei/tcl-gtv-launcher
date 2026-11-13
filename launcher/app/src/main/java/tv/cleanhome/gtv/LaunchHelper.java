@@ -77,14 +77,8 @@ public final class LaunchHelper {
             IntentTarget.action(Settings.ACTION_DREAM_SETTINGS)
     };
 
-    // Inputs overlay service candidates (TV2 player service -> TV1 sourcemenu service)
-    public static final IntentTarget[] INPUTS_SERVICES = {
-            IntentTarget.service("com.tcl.insrc.SHOW_WINDOW", "com.tcl.tv", "com.tcl.player.service.ShowWindowService"),
-            IntentTarget.service("com.tcl.insrc.SHOW_WINDOW", "com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService")
-    };
-
-    // Inputs activity candidates (TV2 suspension / Quick_Panel -> TV1 tvinput)
-    public static final IntentTarget[] INPUTS_ACTIVITIES = {
+    // Inputs candidates: TCL Quick_Panel bottom drawer (VIEW_INPUTS) -> suspension -> tvinput
+    public static final IntentTarget[] INPUTS_TARGETS = {
             IntentTarget.action("com.android.tv.action.VIEW_INPUTS"),
             IntentTarget.action("com.tcl.suspension.VIEW_INPUTS"),
             IntentTarget.component("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
@@ -213,7 +207,7 @@ public final class LaunchHelper {
     }
 
     /**
-     * Opens the TV inputs selector overlay with debounce protection against remote bounces.
+     * Opens the TV inputs selector overlay (bottom drawer) with debounce protection against remote bounces.
      */
     public static synchronized boolean openInputs(Context context) {
         if (context == null) return false;
@@ -223,17 +217,7 @@ public final class LaunchHelper {
         }
         lastInputLaunchTime = now;
 
-        // 1. Try native OEM overlay services
-        for (IntentTarget target : INPUTS_SERVICES) {
-            try {
-                Intent serviceIntent = target.toIntent();
-                ComponentName cn = context.startService(serviceIntent);
-                if (cn != null) return true;
-            } catch (Throwable ignored) {}
-        }
-
-        // 2. Try Activity fallbacks
-        return launchFirst(context, INPUTS_ACTIVITIES);
+        return launchFirst(context, INPUTS_TARGETS);
     }
 
     /**

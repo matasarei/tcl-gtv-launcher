@@ -94,9 +94,8 @@ check_action "Screensaver" \
 # 2. TV Inputs
 check_action "TV Inputs" \
   "-a com.android.tv.action.VIEW_INPUTS" \
+  "-a com.tcl.suspension.VIEW_INPUTS" \
   "-n com.tcl.suspension/com.tcl.suspension.ui.main.InputActivity" \
-  "service:com.tcl.tv/com.tcl.player.service.ShowWindowService" \
-  "service:com.tcl.tv/com.tcl.sourcemenu.insrc.ShowWindowService" \
   "-n com.tcl.tvinput/com.tcl.tvinput.MainActivity"
 
 # 3. Accounts & Sign-in
