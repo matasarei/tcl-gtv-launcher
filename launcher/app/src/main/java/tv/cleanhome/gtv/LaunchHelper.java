@@ -3,9 +3,10 @@ package tv.cleanhome.gtv;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 
 /**
- * Shared helper for resolving and launching apps and third-party clients.
+ * Shared helper for resolving and launching apps, screensaver, and system shortcuts.
  */
 public final class LaunchHelper {
     public static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
@@ -18,6 +19,33 @@ public final class LaunchHelper {
     };
 
     private LaunchHelper() {}
+
+    /**
+     * Starts the TV screensaver / ambient dream mode.
+     * Prioritizes Google TV's direct daydream sleep action (com.google.android.pano.action.SLEEP),
+     * followed by Ambient settings and AOSP Somnambulator fallback.
+     */
+    public static void startScreensaver(Context context) {
+        Intent[] intents = new Intent[]{
+                // 1. Google TV direct screensaver/sleep intent (proven on Android 11 & 14 TV)
+                new Intent("com.google.android.pano.action.SLEEP"),
+                new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.display.daydream.DaydreamVoiceAction"),
+                // 2. Google TV Ambient mode activity
+                new Intent("com.google.android.tv.settings.ambient"),
+                new Intent().setClassName("com.android.tv.settings", "com.google.android.tv.settings.AmbientActivity"),
+                // 3. Stock AOSP Somnambulator (Android 11 / RTD2851)
+                new Intent(Intent.ACTION_MAIN).setClassName("com.android.systemui", "com.android.systemui.Somnambulator"),
+                // 4. Standard Dream settings fallback
+                new Intent(Settings.ACTION_DREAM_SETTINGS)
+        };
+        for (Intent intent : intents) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                context.startActivity(intent);
+                return;
+            } catch (Throwable ignored) {}
+        }
+    }
 
     /**
      * Attempts to launch YouTube or alternative leanback YouTube clients (e.g. SmartTube).

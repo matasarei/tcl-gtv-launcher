@@ -444,10 +444,7 @@ public class MainActivity extends Activity {
     }
 
     void startScreensaver() {
-        // The stock dream (Google's dreamx Backdrop on Google TV), started now, as Settings' "Start now" does.
-        Intent dream = new Intent(Intent.ACTION_MAIN)
-                .setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
-        if (!start(dream)) start(new Intent(Settings.ACTION_DREAM_SETTINGS));
+        LaunchHelper.startScreensaver(this);
     }
 
     static void fade(View v, float to) {

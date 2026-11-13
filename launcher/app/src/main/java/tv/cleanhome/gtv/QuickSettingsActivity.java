@@ -123,7 +123,7 @@ public class QuickSettingsActivity extends Activity {
                         new Intent("android.settings.ACCESSIBILITY_TV_OEM_LINK"),
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.oemlink.AccessibilitySettingsActivity"),
                         new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)}},
-                {getString(R.string.tile_screensaver), R.drawable.ic_frame, new Intent[]{new Intent(Settings.ACTION_DREAM_SETTINGS)}},
+                {getString(R.string.tile_screensaver), R.drawable.ic_frame, (Runnable) () -> LaunchHelper.startScreensaver(this)},
                 {getString(R.string.tile_refresh_album), R.drawable.ic_refresh, (Runnable) () -> sendBroadcast(new Intent(ACTION_REFRESH_ALBUM).setPackage(getPackageName()))},
         };
 
