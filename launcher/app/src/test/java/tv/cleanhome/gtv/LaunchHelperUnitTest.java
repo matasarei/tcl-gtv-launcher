@@ -53,24 +53,14 @@ public class LaunchHelperUnitTest {
 
     @Test
     public void testInputsTargetsCoverage() {
-        // Services
-        IntentTarget[] services = LaunchHelper.INPUTS_SERVICES;
-        assertNotNull(services);
-        assertTrue("Must contain both Android 14 and Android 11 TCL input services", services.length >= 2);
-        assertTrue("Must contain Android 14 TCL player ShowWindowService",
-                containsComponent(services, "com.tcl.tv", "com.tcl.player.service.ShowWindowService"));
-        assertTrue("Must contain Android 11 TCL sourcemenu ShowWindowService",
-                containsComponent(services, "com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService"));
-
-        // Activities
-        IntentTarget[] activities = LaunchHelper.INPUTS_ACTIVITIES;
-        assertNotNull(activities);
+        IntentTarget[] targets = LaunchHelper.INPUTS_TARGETS;
+        assertNotNull(targets);
         assertTrue("Must contain Android TV standard VIEW_INPUTS",
-                containsAction(activities, "com.android.tv.action.VIEW_INPUTS"));
+                containsAction(targets, "com.android.tv.action.VIEW_INPUTS"));
         assertTrue("Must contain TV2 Quick_Panel InputActivity",
-                containsComponent(activities, "com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"));
+                containsComponent(targets, "com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"));
         assertTrue("Must contain TV1 tvinput MainActivity",
-                containsComponent(activities, "com.tcl.tvinput", "com.tcl.tvinput.MainActivity"));
+                containsComponent(targets, "com.tcl.tvinput", "com.tcl.tvinput.MainActivity"));
     }
 
     @Test
@@ -186,10 +176,42 @@ public class LaunchHelperUnitTest {
         assertEquals("Live TV package must be com.tcl.tv", "com.tcl.tv", LaunchHelper.PKG_TV);
         IntentTarget[] targets = LaunchHelper.LIVE_TV_TARGETS;
         assertNotNull(targets);
-        assertTrue("Must contain player.TVActivity",
+        assertTrue("Must contain player.TVActivity for TV2",
                 containsComponent(targets, "com.tcl.tv", "com.tcl.player.TVActivity"));
-        assertTrue("Must contain tv.TVActivity",
+        assertTrue("Must contain tv.TVActivity for TV1",
                 containsComponent(targets, "com.tcl.tv", "com.tcl.tv.TVActivity"));
+        assertTrue("Must contain tcl.sys.intent.action.TV fallback",
+                containsAction(targets, "tcl.sys.intent.action.TV"));
+    }
+
+    @Test
+    public void testNetflixTargetsCoverage() {
+        assertEquals("Netflix package must be com.netflix.ninja", "com.netflix.ninja", LaunchHelper.PKG_NETFLIX);
+        IntentTarget[] targets = LaunchHelper.NETFLIX_TARGETS;
+        assertNotNull(targets);
+        assertTrue("Must contain Netflix MainActivity component",
+                containsComponent(targets, "com.netflix.ninja", "com.netflix.ninja.MainActivity"));
+    }
+
+    @Test
+    public void testPrimeVideoTargetsCoverage() {
+        assertEquals("Prime Video package must be com.amazon.amazonvideo.livingroom",
+                "com.amazon.amazonvideo.livingroom", LaunchHelper.PKG_PRIMEVIDEO);
+        IntentTarget[] targets = LaunchHelper.PRIMEVIDEO_TARGETS;
+        assertNotNull(targets);
+        assertTrue("Must contain IgnitionActivity component",
+                containsComponent(targets, "com.amazon.amazonvideo.livingroom", "com.amazon.ignition.IgnitionActivity"));
+        assertTrue("Must contain AMAZON_BUTTON action fallback",
+                containsAction(targets, "com.amazon.amazonvideo.livingroom.AMAZON_BUTTON"));
+    }
+
+    @Test
+    public void testBrowserPackagesCoverage() {
+        String[] browsers = LaunchHelper.BROWSER_PACKAGES;
+        assertNotNull(browsers);
+        assertTrue("Must contain at least 4 browser options", browsers.length >= 4);
+        assertEquals("First priority must be TV Bro", "com.phlox.tvwebbrowser", browsers[0]);
+        assertEquals("Second priority must be TCL Browser", "com.tcl.browser", browsers[1]);
     }
 
     @Test

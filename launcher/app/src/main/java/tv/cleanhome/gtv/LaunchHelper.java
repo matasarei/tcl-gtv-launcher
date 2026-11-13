@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.provider.Settings;
 
@@ -17,7 +18,10 @@ import android.provider.Settings;
  */
 public final class LaunchHelper {
     public static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
+    public static final String PKG_NETFLIX = "com.netflix.ninja";
+    public static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
     public static final String PKG_TV = "com.tcl.tv";
+    public static final String PKG_DISNEY = "com.disney.disneyplus";
 
     public static final long DEBOUNCE_THRESHOLD_MS = 1000L;
     private static long lastInputLaunchTime = 0L;
@@ -27,6 +31,14 @@ public final class LaunchHelper {
             "com.liskovsoft.videomanager",
             "com.liskovsoft.smarttubetv.beta",
             "com.liskovsoft.smarttubetv"
+    };
+
+    public static final String[] BROWSER_PACKAGES = {
+            "com.phlox.tvwebbrowser",
+            "com.tcl.browser",
+            "org.mozilla.tv.firefox",
+            "com.google.android.apps.chrome",
+            "com.android.chrome"
     };
 
     /**
@@ -77,14 +89,8 @@ public final class LaunchHelper {
             IntentTarget.action(Settings.ACTION_DREAM_SETTINGS)
     };
 
-    // Inputs overlay service candidates (TV2 player service -> TV1 sourcemenu service)
-    public static final IntentTarget[] INPUTS_SERVICES = {
-            IntentTarget.service("com.tcl.insrc.SHOW_WINDOW", "com.tcl.tv", "com.tcl.player.service.ShowWindowService"),
-            IntentTarget.service("com.tcl.insrc.SHOW_WINDOW", "com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService")
-    };
-
-    // Inputs activity candidates (TV2 suspension / Quick_Panel -> TV1 tvinput)
-    public static final IntentTarget[] INPUTS_ACTIVITIES = {
+    // Inputs candidates: TCL Quick_Panel bottom drawer (VIEW_INPUTS) -> suspension -> tvinput
+    public static final IntentTarget[] INPUTS_TARGETS = {
             IntentTarget.action("com.android.tv.action.VIEW_INPUTS"),
             IntentTarget.action("com.tcl.suspension.VIEW_INPUTS"),
             IntentTarget.component("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
@@ -149,10 +155,22 @@ public final class LaunchHelper {
             IntentTarget.action(Settings.ACTION_SETTINGS)
     };
 
-    // Live TV component fallback candidates
+    // Live TV component fallback candidates (TV2 player.TVActivity -> TV1 tv.TVActivity -> tcl.sys.intent.action.TV)
     public static final IntentTarget[] LIVE_TV_TARGETS = {
             IntentTarget.component(PKG_TV, "com.tcl.player.TVActivity"),
-            IntentTarget.component(PKG_TV, "com.tcl.tv.TVActivity")
+            IntentTarget.component(PKG_TV, "com.tcl.tv.TVActivity"),
+            IntentTarget.action("tcl.sys.intent.action.TV")
+    };
+
+    // Netflix component fallback candidates
+    public static final IntentTarget[] NETFLIX_TARGETS = {
+            IntentTarget.component(PKG_NETFLIX, "com.netflix.ninja.MainActivity")
+    };
+
+    // Prime Video fallback candidates
+    public static final IntentTarget[] PRIMEVIDEO_TARGETS = {
+            IntentTarget.component(PKG_PRIMEVIDEO, "com.amazon.ignition.IgnitionActivity"),
+            IntentTarget.action("com.amazon.amazonvideo.livingroom.AMAZON_BUTTON")
     };
 
     private LaunchHelper() {}
@@ -213,7 +231,7 @@ public final class LaunchHelper {
     }
 
     /**
-     * Opens the TV inputs selector overlay with debounce protection against remote bounces.
+     * Opens the TV inputs selector overlay (bottom drawer) with debounce protection against remote bounces.
      */
     public static synchronized boolean openInputs(Context context) {
         if (context == null) return false;
@@ -223,37 +241,33 @@ public final class LaunchHelper {
         }
         lastInputLaunchTime = now;
 
-        // 1. Try native OEM overlay services
-        for (IntentTarget target : INPUTS_SERVICES) {
-            try {
-                Intent serviceIntent = target.toIntent();
-                ComponentName cn = context.startService(serviceIntent);
-                if (cn != null) return true;
-            } catch (Throwable ignored) {}
-        }
-
-        // 2. Try Activity fallbacks
-        return launchFirst(context, INPUTS_ACTIVITIES);
+        return launchFirst(context, INPUTS_TARGETS);
     }
 
     /**
-     * Launches Live TV using package launcher intent with component fallbacks.
+     * Launches Live TV using priority component candidates, OEM broadcast, channel URI, or package launch.
      */
     public static boolean openLiveTv(Context context) {
         if (context == null) return false;
-        PackageManager pm = context.getPackageManager();
-        Intent intent = pm.getLeanbackLaunchIntentForPackage(PKG_TV);
-        if (intent == null) {
-            intent = pm.getLaunchIntentForPackage(PKG_TV);
+        // Priority 1: Direct component targets (com.tcl.player.TVActivity on TV2, com.tcl.tv.TVActivity on TV1)
+        if (launchFirst(context, LIVE_TV_TARGETS)) {
+            return true;
         }
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            try {
-                context.startActivity(intent);
-                return true;
-            } catch (Throwable ignored) {}
-        }
-        return launchFirst(context, LIVE_TV_TARGETS);
+        // Priority 2: System broadcast
+        try {
+            Intent bcast = new Intent("tcl.sys.intent.action.TV");
+            bcast.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.sendBroadcast(bcast);
+        } catch (Throwable ignored) {}
+        // Priority 3: TV channel content URI
+        try {
+            Intent tvUri = new Intent(Intent.ACTION_VIEW, Uri.parse("content://android.media.tv/channel"));
+            tvUri.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(tvUri);
+            return true;
+        } catch (Throwable ignored) {}
+        // Priority 4: Standard package launch
+        return launchPackage(context, PKG_TV);
     }
 
     /**
@@ -274,6 +288,67 @@ public final class LaunchHelper {
             if (launchPackage(context, PKG_YOUTUBE)) return true;
         } catch (Exception ignored) {}
         return false;
+    }
+
+    /**
+     * Launches Netflix with component fallback.
+     */
+    public static boolean openNetflix(Context context) {
+        if (context == null) return false;
+        if (launchPackage(context, PKG_NETFLIX)) return true;
+        return launchFirst(context, NETFLIX_TARGETS);
+    }
+
+    /**
+     * Launches Prime Video using package launch, IgnitionActivity component, or OEM action.
+     */
+    public static boolean openPrimeVideo(Context context) {
+        if (context == null) return false;
+        if (launchPackage(context, PKG_PRIMEVIDEO)) return true;
+        if (launchFirst(context, PRIMEVIDEO_TARGETS)) return true;
+        String[] altPkgs = {"com.amazon.avod.thirdpartyclient", "com.amazon.amazonvideo.livingroom.banner"};
+        for (String pkg : altPkgs) {
+            if (launchPackage(context, pkg)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Launches an installed TV browser, falling back to TV Bro in Play Store.
+     */
+    public static boolean openBrowser(Context context) {
+        if (context == null) return false;
+        for (String pkg : BROWSER_PACKAGES) {
+            if (launchPackage(context, pkg)) return true;
+        }
+        try {
+            Intent store = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.phlox.tvwebbrowser"));
+            store.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(store);
+            return true;
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
+    /**
+     * Navigates to the launcher Apps tab.
+     */
+    public static void openApps(Context context) {
+        if (context == null) return;
+        if (context instanceof MainActivity) {
+            MainActivity main = (MainActivity) context;
+            if (main.tabApps != null) {
+                main.selectTab(main.tabApps);
+                main.tabApps.requestFocus();
+                return;
+            }
+        }
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(MainActivity.EXTRA_TAB, MainActivity.TAB_APPS);
+        try {
+            context.startActivity(intent);
+        } catch (Throwable ignored) {}
     }
 
     /**
