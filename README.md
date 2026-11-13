@@ -37,8 +37,8 @@ This is a dedicated fork of [alexkev/tcl-gtv-launcher](https://github.com/alexke
   - Memory-optimized bitmap decoding (`RGB_565`) designed for budget TV SoCs with 1.5GB–2GB RAM.
   - Efficient event-driven window tracking without synchronous IPC bottlenecks or keylogging.
 - **Modular & Configurable Setup:**
-  - Opt-in flags for bundled wallpaper pack (`WALLPAPERS=1`), AdGuard Private DNS (`ADGUARD_DNS=1`), and Plezy Plex client (`PLEZY=1`).
-  - Bundled local wallpaper rotation or live Google Photos album stream.
+  - Bundled offline landscape wallpapers (dynamic rotation) out-of-the-box or custom Google Photos album stream.
+  - Opt-in flags for AdGuard Private DNS (`ADGUARD_DNS=1`) and Plezy Plex client (`PLEZY=1`).
 
 ---
 
@@ -78,16 +78,13 @@ cd tcl-gtv-launcher
 Run the setup script from the repository root:
 
 ```bash
-# Minimal clean setup (clean dark background, system DNS)
+# Standard setup (bundled wallpapers, system DNS)
 kit/setup.sh <tv-ip>
 
-# Setup with bundled wallpapers
-WALLPAPERS=1 kit/setup.sh <tv-ip>
+# Setup with AdGuard ad-blocking DNS and Plezy
+ADGUARD_DNS=1 PLEZY=1 kit/setup.sh <tv-ip>
 
-# Setup with bundled wallpapers, AdGuard ad-blocking DNS, and Plezy
-WALLPAPERS=1 ADGUARD_DNS=1 PLEZY=1 kit/setup.sh <tv-ip>
-
-# Setup with Google Photos album background
+# Setup with custom Google Photos album background
 kit/setup.sh <tv-ip> "https://photos.app.goo.gl/your-album-link"
 ```
 

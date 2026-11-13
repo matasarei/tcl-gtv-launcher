@@ -25,4 +25,4 @@ A lightweight, distraction-free Google TV-style leanback launcher (`tv.cleanhome
   - Background wallpaper handling must use `Bitmap.Config.RGB_565` and appropriate `inSampleSize` downsampling to prevent OutOfMemory errors.
   - Avoid memory leaks, long-lived static view references, or unbounded image caching.
 - **Submodules & External Trees:**
-  - `cleanyourtv/` (setup tools, ADB debloat scripts) and `wallpapers/` are git submodules. Do not modify submodule contents unless explicitly instructed.
+  - `cleanyourtv/` (setup tools, ADB debloat scripts) is a git submodule. Do not modify submodule contents unless explicitly instructed.
