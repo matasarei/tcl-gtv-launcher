@@ -238,35 +238,7 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openTvInputs() {
-        long now = SystemClock.uptimeMillis();
-        if (now - lastInputOpenedTime < 1000) {
-            Log.i(TAG, "Debouncing TV inputs launch");
-            return;
-        }
-        lastInputOpenedTime = now;
-
-        // 1. Native TCL input sources overlay service (proven to show input selector)
-        try {
-            Intent serviceIntent = new Intent("com.tcl.insrc.SHOW_WINDOW");
-            serviceIntent.setClassName("com.tcl.tv", "com.tcl.sourcemenu.insrc.ShowWindowService");
-            ComponentName cn = startService(serviceIntent);
-            if (cn != null) return;
-        } catch (Exception ignored) {}
-
-        // 2. Standard Android TV input picker
-        Intent[] intents = new Intent[]{
-                new Intent("com.android.tv.action.VIEW_INPUTS"),
-                new Intent("com.tcl.suspension.VIEW_INPUTS"),
-                new Intent().setClassName("com.tcl.suspension", "com.tcl.suspension.ui.main.InputActivity"),
-                new Intent().setClassName("com.tcl.tvinput", "com.tcl.tvinput.MainActivity")
-        };
-        for (Intent intent : intents) {
-            try {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return;
-            } catch (Exception ignored) {}
-        }
+        LaunchHelper.openInputs(this);
     }
 
     private void openYouTube() {
@@ -280,20 +252,7 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openLiveTv() {
-        if (!launchPackage(PKG_TV)) {
-            String[] tvActivities = {
-                    "com.tcl.player.TVActivity",
-                    "com.tcl.tv.TVActivity"
-            };
-            for (String act : tvActivities) {
-                try {
-                    Intent intent = new Intent().setClassName(PKG_TV, act);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    return;
-                } catch (Exception ignored) {}
-            }
-        }
+        LaunchHelper.openLiveTv(this);
     }
 
     private boolean launchPackage(String packageName) {
