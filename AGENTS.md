@@ -9,7 +9,7 @@ A lightweight, distraction-free Google TV-style leanback launcher (`tv.cleanhome
 | Build Release APK | `cd launcher && ./gradlew assembleRelease` |
 | Test | `cd launcher && ./gradlew test` |
 | Lint & Checks | `cd launcher && ./gradlew check` |
-| Deploy (Sideload) | `adb push launcher/app/build/outputs/apk/release/app-release.apk /data/local/tmp/gtvhome.apk && adb shell "pm install -r /data/local/tmp/gtvhome.apk && rm /data/local/tmp/gtvhome.apk"` |
+| Deploy (Sideload) | `adb push launcher/app/build/outputs/apk/release/app-release.apk /data/local/tmp/gtvhome.apk && adb shell "pm install -r /data/local/tmp/gtvhome.apk && pm grant tv.cleanhome.gtv android.permission.READ_TV_LISTINGS; pm grant tv.cleanhome.gtv android.permission.WRITE_SECURE_SETTINGS 2>/dev/null || true; appops set tv.cleanhome.gtv AUTO_START allow; appops set tv.cleanhome.gtv ACCESS_RESTRICTED_SETTINGS allow; cur=\$(settings get secure enabled_accessibility_services); case \"\$cur\" in *tv.cleanhome.gtv.GlobalKeyService*) ;; null|\"\") settings put secure enabled_accessibility_services tv.cleanhome.gtv/tv.cleanhome.gtv.GlobalKeyService ;; *) settings put secure enabled_accessibility_services \"\$cur:tv.cleanhome.gtv/tv.cleanhome.gtv.GlobalKeyService\" ;; esac; settings put secure accessibility_enabled 1; rm /data/local/tmp/gtvhome.apk"` |
 | Restart Launcher | `adb shell am force-stop tv.cleanhome.gtv && adb shell monkey -p tv.cleanhome.gtv -c android.intent.category.HOME 1` |
 
 ## Architecture & Code Conventions

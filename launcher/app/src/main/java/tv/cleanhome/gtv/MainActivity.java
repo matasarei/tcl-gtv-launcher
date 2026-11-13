@@ -223,6 +223,7 @@ public class MainActivity extends Activity {
         if (checkSelfPermission(READ_TV) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_TV}, 1);
         }
+        ensureAccessibilityServiceEnabled();
         loadPhotos();
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -241,11 +242,26 @@ public class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
+        ensureAccessibilityServiceEnabled();
         refreshHome();
         buildAppsGrid();
         loadWeather();
         ui.removeCallbacks(photoTick);
         ui.postDelayed(photoTick, photoDelay());
+    }
+
+    void ensureAccessibilityServiceEnabled() {
+        try {
+            String enabledServices = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            String myService = getPackageName() + "/" + GlobalKeyService.class.getName();
+            if (enabledServices == null || !enabledServices.contains(myService)) {
+                String updated = (enabledServices == null || enabledServices.isEmpty())
+                        ? myService
+                        : enabledServices + ":" + myService;
+                Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, updated);
+                Settings.Secure.putInt(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+            }
+        } catch (Throwable ignored) {}
     }
 
     @Override protected void onPause() {
@@ -1041,13 +1057,13 @@ public class MainActivity extends Activity {
     @Override public boolean dispatchKeyEvent(KeyEvent e) {
         int k = e.getKeyCode();
         if (GlobalKeyService.isSettingsKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 startActivity(new Intent(this, QuickSettingsActivity.class));
             }
             return true;
         }
         if (GlobalKeyService.isProfileKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 Intent intent = new Intent(this, QuickSettingsActivity.class);
                 intent.putExtra(QuickSettingsActivity.EXTRA_FOCUS_TILE, "Accounts");
                 startActivity(intent);
@@ -1055,32 +1071,32 @@ public class MainActivity extends Activity {
             return true;
         }
         if (GlobalKeyService.isTvKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openLiveTv();
             }
             return true;
         }
         if (GlobalKeyService.isAppsKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 selectTab(tabApps);
                 tabApps.requestFocus();
             }
             return true;
         }
         if (GlobalKeyService.isYouTubeKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openYouTube();
             }
             return true;
         }
         if (GlobalKeyService.isListKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openLiveTv();
             }
             return true;
         }
         if (GlobalKeyService.isInputKey(k)) {
-            if (e.getAction() == KeyEvent.ACTION_DOWN) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openInputs();
             }
             return true;

@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
     <!-- Hold OK on an app in the Apps grid: the system's own uninstall dialog (ACTION_DELETE). -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Self-heal GlobalKeyService accessibility binding on boot / update if granted via ADB. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" xmlns:tools="http://schemas.android.com/tools" />
 
     <queries>
         <intent>

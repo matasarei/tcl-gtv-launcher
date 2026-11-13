@@ -107,8 +107,10 @@ public class QuickSettingsActivity extends Activity {
                         new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.device.apps.AppsActivity"),
                         new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)}},
                 {getString(R.string.tile_accounts), R.drawable.ic_account, new Intent[]{
-                        new Intent(Settings.ACTION_SETTINGS),
-                        new Intent(Settings.ACTION_ADD_ACCOUNT)}},
+                        new Intent().setClassName("com.android.tv.settings", "com.google.android.tv.settings.AccountActivity"),
+                        new Intent("android.settings.SYNC_SETTINGS"),
+                        new Intent(Settings.ACTION_ADD_ACCOUNT),
+                        new Intent(Settings.ACTION_SETTINGS)}},
                 {getString(R.string.tile_inputs), R.drawable.ic_input, (Runnable) this::openInputs},
                 {getString(R.string.tile_picture), R.drawable.ic_picture, new Intent[]{new Intent(Settings.ACTION_DISPLAY_SETTINGS)}},
                 {getString(R.string.tile_network), R.drawable.ic_ethernet, new Intent[]{
