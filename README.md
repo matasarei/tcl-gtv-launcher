@@ -5,7 +5,6 @@
 [![Platform](https://img.shields.io/badge/Platform-Android%20TV%20%7C%20Google%20TV-blue.svg)](https://android.com/tv/)
 [![Tested On](https://img.shields.io/badge/Tested%20On-TCL%2043V6B%20%28A11%29%20%7C%20G08%20%28A14%29-orange.svg)](#tested-devices)
 [![Telemetry](https://img.shields.io/badge/Telemetry-Zero%20%2F%20Ad--Free-success.svg)](#network--privacy)
-[![Fork of](https://img.shields.io/badge/Forked%20from-alexkev%2Ftcl--gtv--launcher-lightgrey.svg)](https://github.com/alexkev/tcl-gtv-launcher)
 
 A clean, ad-free, high-performance Google TV–style home screen purpose-built for TCL Google TVs and Android TVs.
 
