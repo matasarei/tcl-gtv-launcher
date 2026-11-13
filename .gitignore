@@ -12,3 +12,4 @@ launcher/local.properties
 .DS_Store
 .tasks/
 .gku/
+.gemini/
