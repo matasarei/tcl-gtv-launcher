@@ -31,7 +31,7 @@ public class GlobalKeyService extends AccessibilityService {
     private static final int KEYCODE_BUTTON_3 = 190;
     private static final int KEYCODE_BOOKMARK = 174;
 
-    private static final String PKG_YOUTUBE = "com.google.android.youtube.tv";
+    private static final String PKG_YOUTUBE = LaunchHelper.PKG_YOUTUBE;
     private static final String PKG_NETFLIX = "com.netflix.ninja";
     private static final String PKG_PRIMEVIDEO = "com.amazon.amazonvideo.livingroom";
     private static final String PKG_TV = "com.tcl.tv";
@@ -270,22 +270,9 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private void openYouTube() {
-        String[] youtubePackages = {
-                PKG_YOUTUBE,
-                "com.liskovsoft.videomanager",
-                "com.liskovsoft.smarttubetv.beta",
-                "com.liskovsoft.smarttubetv"
-        };
-        for (String pkg : youtubePackages) {
-            if (launchPackage(pkg)) return;
+        if (!LaunchHelper.openYouTube(this)) {
+            Toast.makeText(this, PKG_YOUTUBE + " is not installed", Toast.LENGTH_SHORT).show();
         }
-        try {
-            getPackageManager().setApplicationEnabledSetting(
-                    PKG_YOUTUBE,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    0);
-            if (launchPackage(PKG_YOUTUBE)) return;
-        } catch (Exception ignored) {}
     }
 
     private boolean isTvForeground() {
@@ -310,14 +297,7 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     private boolean launchPackage(String packageName) {
-        PackageManager pm = getPackageManager();
-        Intent intent = pm.getLeanbackLaunchIntentForPackage(packageName);
-        if (intent == null) {
-            intent = pm.getLaunchIntentForPackage(packageName);
-        }
-        if (intent != null) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            startActivity(intent);
+        if (LaunchHelper.launchPackage(this, packageName)) {
             return true;
         }
         Toast.makeText(this, packageName + " is not installed", Toast.LENGTH_SHORT).show();

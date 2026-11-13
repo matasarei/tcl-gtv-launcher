@@ -406,29 +406,7 @@ public class MainActivity extends Activity {
     }
 
     void openYouTube() {
-        String[] youtubePackages = {
-                "com.google.android.youtube.tv",
-                "com.liskovsoft.videomanager",
-                "com.liskovsoft.smarttubetv.beta",
-                "com.liskovsoft.smarttubetv"
-        };
-        for (String pkg : youtubePackages) {
-            Intent intent = pm.getLeanbackLaunchIntentForPackage(pkg);
-            if (intent == null) intent = pm.getLaunchIntentForPackage(pkg);
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                if (start(intent)) return;
-            }
-        }
-        try {
-            getPackageManager().setApplicationEnabledSetting(
-                    "com.google.android.youtube.tv",
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    0);
-            Intent intent = pm.getLeanbackLaunchIntentForPackage("com.google.android.youtube.tv");
-            if (intent == null) intent = pm.getLaunchIntentForPackage("com.google.android.youtube.tv");
-            if (intent != null && start(intent)) return;
-        } catch (Exception ignored) {}
+        LaunchHelper.openYouTube(this);
     }
 
     void openLiveTv() {
