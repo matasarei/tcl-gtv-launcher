@@ -28,7 +28,4 @@
     <!-- Subscriptions row: YouTube's preview channel with this name. -->
     <string name="subscriptions_package" translatable="false">com.google.android.youtube.tv</string>
     <string name="subscriptions_channel" translatable="false">Subscriptions</string>
-
-    <!-- Live button: the TV app that plays the antenna tuner or a live TV app. Empty to hide the tab. -->
-    <string name="live_package" translatable="false">com.tcl.tv</string>
 </resources>
