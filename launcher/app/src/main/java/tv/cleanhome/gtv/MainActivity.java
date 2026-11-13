@@ -252,12 +252,19 @@ public class MainActivity extends Activity {
 
     void ensureAccessibilityServiceEnabled() {
         try {
-            String enabledServices = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             String myService = getPackageName() + "/" + GlobalKeyService.class.getName();
-            if (enabledServices == null || !enabledServices.contains(myService)) {
+            String enabledServices = Settings.Secure.getString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            if (!GlobalKeyService.isConnected) {
+                // If service is not connected (e.g. after update or force-stop placing it into Crashed Services),
+                // toggle the setting: clear myService then restore it, forcing Android AccessibilityManagerService
+                // to clear the crash record and rebind immediately.
+                if (enabledServices != null && enabledServices.contains(myService)) {
+                    String cleared = enabledServices.replace(myService, "").replace("::", ":").replaceAll("^:|:$", "");
+                    Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, cleared);
+                }
                 String updated = (enabledServices == null || enabledServices.isEmpty())
                         ? myService
-                        : enabledServices + ":" + myService;
+                        : (enabledServices.contains(myService) ? enabledServices : enabledServices + ":" + myService);
                 Settings.Secure.putString(getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES, updated);
                 Settings.Secure.putInt(getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
             }
@@ -404,6 +411,18 @@ public class MainActivity extends Activity {
 
     void openLiveTv() {
         LaunchHelper.openLiveTv(this);
+    }
+
+    void openNetflix() {
+        LaunchHelper.openNetflix(this);
+    }
+
+    void openPrimeVideo() {
+        LaunchHelper.openPrimeVideo(this);
+    }
+
+    void openBrowser() {
+        LaunchHelper.openBrowser(this);
     }
 
     void startScreensaver() {
@@ -1046,6 +1065,30 @@ public class MainActivity extends Activity {
         if (GlobalKeyService.isYouTubeKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
                 openYouTube();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isNetflixKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+                openNetflix();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isPrimeVideoKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+                openPrimeVideo();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isBrowserKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+                openBrowser();
+            }
+            return true;
+        }
+        if (GlobalKeyService.isDisneyKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+                LaunchHelper.launchPackage(this, LaunchHelper.PKG_DISNEY);
             }
             return true;
         }

@@ -176,10 +176,42 @@ public class LaunchHelperUnitTest {
         assertEquals("Live TV package must be com.tcl.tv", "com.tcl.tv", LaunchHelper.PKG_TV);
         IntentTarget[] targets = LaunchHelper.LIVE_TV_TARGETS;
         assertNotNull(targets);
-        assertTrue("Must contain player.TVActivity",
+        assertTrue("Must contain player.TVActivity for TV2",
                 containsComponent(targets, "com.tcl.tv", "com.tcl.player.TVActivity"));
-        assertTrue("Must contain tv.TVActivity",
+        assertTrue("Must contain tv.TVActivity for TV1",
                 containsComponent(targets, "com.tcl.tv", "com.tcl.tv.TVActivity"));
+        assertTrue("Must contain tcl.sys.intent.action.TV fallback",
+                containsAction(targets, "tcl.sys.intent.action.TV"));
+    }
+
+    @Test
+    public void testNetflixTargetsCoverage() {
+        assertEquals("Netflix package must be com.netflix.ninja", "com.netflix.ninja", LaunchHelper.PKG_NETFLIX);
+        IntentTarget[] targets = LaunchHelper.NETFLIX_TARGETS;
+        assertNotNull(targets);
+        assertTrue("Must contain Netflix MainActivity component",
+                containsComponent(targets, "com.netflix.ninja", "com.netflix.ninja.MainActivity"));
+    }
+
+    @Test
+    public void testPrimeVideoTargetsCoverage() {
+        assertEquals("Prime Video package must be com.amazon.amazonvideo.livingroom",
+                "com.amazon.amazonvideo.livingroom", LaunchHelper.PKG_PRIMEVIDEO);
+        IntentTarget[] targets = LaunchHelper.PRIMEVIDEO_TARGETS;
+        assertNotNull(targets);
+        assertTrue("Must contain IgnitionActivity component",
+                containsComponent(targets, "com.amazon.amazonvideo.livingroom", "com.amazon.ignition.IgnitionActivity"));
+        assertTrue("Must contain AMAZON_BUTTON action fallback",
+                containsAction(targets, "com.amazon.amazonvideo.livingroom.AMAZON_BUTTON"));
+    }
+
+    @Test
+    public void testBrowserPackagesCoverage() {
+        String[] browsers = LaunchHelper.BROWSER_PACKAGES;
+        assertNotNull(browsers);
+        assertTrue("Must contain at least 4 browser options", browsers.length >= 4);
+        assertEquals("First priority must be TV Bro", "com.phlox.tvwebbrowser", browsers[0]);
+        assertEquals("Second priority must be TCL Browser", "com.tcl.browser", browsers[1]);
     }
 
     @Test

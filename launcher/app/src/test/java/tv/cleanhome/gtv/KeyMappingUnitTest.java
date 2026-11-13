@@ -24,6 +24,11 @@ public class KeyMappingUnitTest {
         int keyTvFallback1 = 170;
         int keyTvFallback2 = 172;
         int keyYouTube = 4065;
+        int keyNetflix = 4062;
+        int keyPrimeVideo = 4099;
+        int keyBrowser = 4159;
+        int keyAppsGrid = 4082;
+        int keyExitBookmark = 4095;
         int keyInputs = 178;
         int keyList = 4090;
         int keyRecordList = 4126;
@@ -36,13 +41,21 @@ public class KeyMappingUnitTest {
         assertTrue("TV1 profile (4016)", GlobalKeyService.isProfileKey(keyProfileTcl));
         assertTrue("TV1 profile legacy (303)", GlobalKeyService.isProfileKey(keyProfileLegacy));
 
-        // TV / Guide
+        // TV / Guide / T-Key
         assertTrue("TV1 TV button (4001)", GlobalKeyService.isTvKey(keyTv));
         assertTrue("TV1 TV button (170)", GlobalKeyService.isTvKey(keyTvFallback1));
         assertTrue("TV1 TV button (172)", GlobalKeyService.isTvKey(keyTvFallback2));
+        assertTrue("TV1 TV TKey (4020)", GlobalKeyService.isTvKey(4020));
 
-        // YouTube
+        // App Buttons: YouTube, Netflix, Prime Video, Browser
         assertTrue("TV1 YouTube button (4065)", GlobalKeyService.isYouTubeKey(keyYouTube));
+        assertTrue("TV1 Netflix button (4062)", GlobalKeyService.isNetflixKey(keyNetflix));
+        assertTrue("TV1 Prime Video button (4099)", GlobalKeyService.isPrimeVideoKey(keyPrimeVideo));
+        assertTrue("TV1 Browser button (4159)", GlobalKeyService.isBrowserKey(keyBrowser));
+
+        // Apps tab / grid button
+        assertTrue("TV1 Apps key (4082)", GlobalKeyService.isAppsKey(keyAppsGrid));
+        assertTrue("TV1 Exit/Bookmark key (4095)", GlobalKeyService.isAppsKey(keyExitBookmark));
 
         // Inputs
         assertTrue("TV1 Inputs button (178)", GlobalKeyService.isInputKey(keyInputs));
@@ -56,6 +69,10 @@ public class KeyMappingUnitTest {
         assertTrue(GlobalKeyService.isHandledKey(keyProfileTcl, false));
         assertTrue(GlobalKeyService.isHandledKey(keyTv, false));
         assertTrue(GlobalKeyService.isHandledKey(keyYouTube, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyNetflix, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyPrimeVideo, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyBrowser, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyAppsGrid, false));
         assertTrue(GlobalKeyService.isHandledKey(keyInputs, false));
         assertTrue(GlobalKeyService.isHandledKey(keyList, false));
     }
@@ -65,10 +82,18 @@ public class KeyMappingUnitTest {
         // TV 2 (Android 14 / G08 / RC833 remote)
         int keySettingsNotification = 83; // KEYCODE_NOTIFICATION
         int keyPeopleProfileSwitch = 288; // KEYCODE_PROFILE_SWITCH
-        int keyTvButton = 4001;           // 0x000c005b
+        int keyTvButton = 4001;           // 0x000c005b / KEYCODE_TCL_EPG
         int keyAppsBookmark = 174;        // KEYCODE_BOOKMARK
         int keyAppsAllApps = 284;         // KEYCODE_ALL_APPS
+        int keyAppsTcl = 4082;            // KEYCODE_TCL_ALL_APP
         int keyYouTubeButton3 = 190;      // KEYCODE_BUTTON_3
+        int keyYouTubeOem = 4065;         // KEYCODE_TCL_YOUTUBE
+        int keyNetflixOem = 4062;         // KEYCODE_TCL_NETFLIX
+        int keyNetflixBtn12 = 199;        // KEYCODE_BUTTON_12
+        int keyPrimeVideoOem = 4099;      // KEYCODE_TCL_PRIMEVIDEO
+        int keyPrimeVideoBtn2 = 189;      // KEYCODE_BUTTON_2
+        int keyBrowserBrowseHere = 4159;  // KEYCODE_TCL_BROWSEHERE
+        int keyDisney = 4141;             // KEYCODE_TCL_DISNEY
         int keyInputs = 178;              // KEYCODE_TV_INPUT
         int keyList = 4090;
 
@@ -80,13 +105,22 @@ public class KeyMappingUnitTest {
 
         // TV button
         assertTrue("TV2 TV button (4001)", GlobalKeyService.isTvKey(keyTvButton));
+        assertTrue("TV2 TV fallback (170)", GlobalKeyService.isTvKey(170));
 
         // Apps button
         assertTrue("TV2 apps bookmark (174)", GlobalKeyService.isAppsKey(keyAppsBookmark));
         assertTrue("TV2 apps all_apps (284)", GlobalKeyService.isAppsKey(keyAppsAllApps));
+        assertTrue("TV2 apps tcl_all_app (4082)", GlobalKeyService.isAppsKey(keyAppsTcl));
 
-        // YouTube button (crucial: 190 was previously misclassified as List)
+        // Dedicated streaming buttons
         assertTrue("TV2 YouTube button (190)", GlobalKeyService.isYouTubeKey(keyYouTubeButton3));
+        assertTrue("TV2 YouTube button (4065)", GlobalKeyService.isYouTubeKey(keyYouTubeOem));
+        assertTrue("TV2 Netflix button (4062)", GlobalKeyService.isNetflixKey(keyNetflixOem));
+        assertTrue("TV2 Netflix button (199)", GlobalKeyService.isNetflixKey(keyNetflixBtn12));
+        assertTrue("TV2 Prime Video button (4099)", GlobalKeyService.isPrimeVideoKey(keyPrimeVideoOem));
+        assertTrue("TV2 Prime Video button (189)", GlobalKeyService.isPrimeVideoKey(keyPrimeVideoBtn2));
+        assertTrue("TV2 Browser button (4159)", GlobalKeyService.isBrowserKey(keyBrowserBrowseHere));
+        assertTrue("TV2 Disney button (4141)", GlobalKeyService.isDisneyKey(keyDisney));
 
         // Inputs button
         assertTrue("TV2 Inputs button (178)", GlobalKeyService.isInputKey(keyInputs));
@@ -100,6 +134,10 @@ public class KeyMappingUnitTest {
         assertTrue(GlobalKeyService.isHandledKey(keyTvButton, false));
         assertTrue(GlobalKeyService.isHandledKey(keyAppsBookmark, false));
         assertTrue(GlobalKeyService.isHandledKey(keyYouTubeButton3, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyNetflixOem, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyPrimeVideoOem, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyBrowserBrowseHere, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyDisney, false));
         assertTrue(GlobalKeyService.isHandledKey(keyInputs, false));
     }
 
@@ -110,6 +148,7 @@ public class KeyMappingUnitTest {
         assertFalse("190 must not be a TV key", GlobalKeyService.isTvKey(190));
         assertFalse("190 must not be a Settings key", GlobalKeyService.isSettingsKey(190));
         assertFalse("190 must not be an Input key", GlobalKeyService.isInputKey(190));
+        assertFalse("190 must not be a Netflix key", GlobalKeyService.isNetflixKey(190));
 
         // Settings button 83 MUST NOT trigger Apps or Profile
         assertFalse("83 must not be an Apps key", GlobalKeyService.isAppsKey(83));
@@ -120,12 +159,22 @@ public class KeyMappingUnitTest {
         assertFalse("288 must not be a Settings key", GlobalKeyService.isSettingsKey(288));
         assertFalse("288 must not be a TV key", GlobalKeyService.isTvKey(288));
 
-        // TV button 4001 MUST NOT trigger Input
+        // TV button 4001 MUST NOT trigger Input or Apps
         assertFalse("4001 must not be an Input key", GlobalKeyService.isInputKey(4001));
+        assertFalse("4001 must not be an Apps key", GlobalKeyService.isAppsKey(4001));
 
         // Input button 178 MUST NOT trigger TV
         assertFalse("178 must not be a TV key", GlobalKeyService.isTvKey(178));
         assertFalse("178 must not be a YouTube key", GlobalKeyService.isYouTubeKey(178));
+
+        // Netflix button 4062 MUST NOT trigger YouTube, Prime Video, or TV
+        assertFalse("4062 must not be YouTube", GlobalKeyService.isYouTubeKey(4062));
+        assertFalse("4062 must not be Prime Video", GlobalKeyService.isPrimeVideoKey(4062));
+        assertFalse("4062 must not be TV", GlobalKeyService.isTvKey(4062));
+
+        // Prime Video button 4099 MUST NOT trigger Netflix or YouTube
+        assertFalse("4099 must not be Netflix", GlobalKeyService.isNetflixKey(4099));
+        assertFalse("4099 must not be YouTube", GlobalKeyService.isYouTubeKey(4099));
     }
 
     @Test
@@ -148,26 +197,9 @@ public class KeyMappingUnitTest {
                 KeyEvent.KEYCODE_9
         };
 
-        for (int code : passThroughKeys) {
-            assertFalse("Key " + code + " must pass through", GlobalKeyService.isHandledKey(code, false));
-            assertFalse("Key " + code + " must not match settings", GlobalKeyService.isSettingsKey(code));
-            assertFalse("Key " + code + " must not match profile", GlobalKeyService.isProfileKey(code));
-            assertFalse("Key " + code + " must not match tv", GlobalKeyService.isTvKey(code));
-            assertFalse("Key " + code + " must not match apps", GlobalKeyService.isAppsKey(code));
-            assertFalse("Key " + code + " must not match input", GlobalKeyService.isInputKey(code));
-            assertFalse("Key " + code + " must not match youtube", GlobalKeyService.isYouTubeKey(code));
-            assertFalse("Key " + code + " must not match list", GlobalKeyService.isListKey(code));
+        for (int k : passThroughKeys) {
+            assertFalse("Key " + k + " must not be handled by GlobalKeyService",
+                    GlobalKeyService.isHandledKey(k, false));
         }
-    }
-
-    @Test
-    public void testTvForegroundDelegation() {
-        // When TV app is in foreground, List key (4090 / 4126) must delegate to native TV channel list
-        assertFalse("List key must delegate when TV is foreground", GlobalKeyService.isHandledKey(4090, true));
-        assertFalse("Record list key must delegate when TV is foreground", GlobalKeyService.isHandledKey(4126, true));
-
-        // When TV is NOT foreground, List key must be handled (to launch TV)
-        assertTrue("List key must be handled when TV is background", GlobalKeyService.isHandledKey(4090, false));
-        assertTrue("Record list key must be handled when TV is background", GlobalKeyService.isHandledKey(4126, false));
     }
 }

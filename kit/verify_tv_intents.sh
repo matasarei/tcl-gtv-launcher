@@ -149,9 +149,10 @@ check_action "Main Settings" \
 
 # 10. Live TV
 check_action "Live TV" \
-  "package:com.tcl.tv" \
   "-n com.tcl.tv/com.tcl.player.TVActivity" \
-  "-n com.tcl.tv/com.tcl.tv.TVActivity"
+  "-n com.tcl.tv/com.tcl.tv.TVActivity" \
+  "-a tcl.sys.intent.action.TV" \
+  "package:com.tcl.tv"
 
 # 11. YouTube / Clients
 check_action "YouTube / Leanback" \
@@ -159,6 +160,25 @@ check_action "YouTube / Leanback" \
   "package:com.liskovsoft.videomanager" \
   "package:com.liskovsoft.smarttubetv.beta" \
   "package:com.liskovsoft.smarttubetv"
+
+# 12. Netflix
+check_action "Netflix" \
+  "package:com.netflix.ninja" \
+  "-n com.netflix.ninja/com.netflix.ninja.MainActivity"
+
+# 13. Prime Video
+check_action "Prime Video" \
+  "package:com.amazon.amazonvideo.livingroom" \
+  "-n com.amazon.amazonvideo.livingroom/com.amazon.ignition.IgnitionActivity" \
+  "-a com.amazon.amazonvideo.livingroom.AMAZON_BUTTON"
+
+# 14. TV Browser
+check_action "Browser" \
+  "package:com.phlox.tvwebbrowser" \
+  "package:com.tcl.browser" \
+  "package:org.mozilla.tv.firefox" \
+  "package:com.google.android.apps.chrome" \
+  "package:com.android.chrome"
 
 echo "--------------------------------------------------"
 echo "Summary: $TOTAL_PASS passed, $TOTAL_FAIL failed."
