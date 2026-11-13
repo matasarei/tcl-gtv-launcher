@@ -33,7 +33,6 @@ public class GlobalKeyService extends AccessibilityService {
     public static final int KEYCODE_BOOKMARK = 174;
 
     public static volatile boolean isConnected = false;
-    public static volatile long lastInputOpenedTime = 0;
 
     private volatile String foregroundPackage = null;
 
