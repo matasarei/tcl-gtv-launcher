@@ -1099,6 +1099,9 @@ public class MainActivity extends Activity {
             return true;
         }
         if (GlobalKeyService.isInputKey(k)) {
+            if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
+                openInputs();
+            }
             return true;
         }
         if (arrangeRow != null) {
