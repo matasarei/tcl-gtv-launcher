@@ -222,4 +222,26 @@ public class KeyMappingUnitTest {
         assertTrue("List key 4090 must be handled when TV is background", GlobalKeyService.isHandledKey(4090, false));
         assertTrue("Record list key 4126 must be handled when TV is background", GlobalKeyService.isHandledKey(4126, false));
     }
+
+    @Test
+    public void testWakeExemptPackages() {
+        String launcherPkg = "tv.cleanhome.gtv";
+        assertTrue("Launcher itself must be exempt from wake overlay",
+                GlobalKeyService.isWakeExemptPackage(launcherPkg, launcherPkg));
+        assertTrue("Screensaver dreamx must be exempt from wake overlay",
+                GlobalKeyService.isWakeExemptPackage("com.google.android.apps.tv.dreamx", launcherPkg));
+        assertTrue("SystemUI must be exempt from wake overlay",
+                GlobalKeyService.isWakeExemptPackage("com.android.systemui", launcherPkg));
+        assertTrue("Spotify must be exempt from wake overlay so daydream can run while listening to music",
+                GlobalKeyService.isWakeExemptPackage("com.spotify.tv.android", launcherPkg));
+        assertTrue("Null must be exempt from wake overlay",
+                GlobalKeyService.isWakeExemptPackage(null, launcherPkg));
+
+        assertFalse("Generic streaming app must not be exempt",
+                GlobalKeyService.isWakeExemptPackage("com.example.streamingplayer", launcherPkg));
+        assertFalse("VLC media player must not be exempt",
+                GlobalKeyService.isWakeExemptPackage("org.videolan.vlc", launcherPkg));
+        assertFalse("BrowseHere browser must not be exempt",
+                GlobalKeyService.isWakeExemptPackage("com.tcl.browser", launcherPkg));
+    }
 }

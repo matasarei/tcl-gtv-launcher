@@ -3,11 +3,24 @@ package tv.cleanhome.gtv;
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.AudioPlaybackConfiguration;
+import android.os.Build;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class GlobalKeyService extends AccessibilityService {
     private static final String TAG = "GlobalKeyService";
@@ -33,16 +46,151 @@ public class GlobalKeyService extends AccessibilityService {
     public static final int KEYCODE_BUTTON_3 = 190;
     public static final int KEYCODE_BOOKMARK = 174;
 
+    public static final String PKG_DREAMX = "com.google.android.apps.tv.dreamx";
+    public static final String PKG_SYSTEMUI = "com.android.systemui";
+
+    private static final Set<String> EXEMPT_WAKE_PACKAGES = new HashSet<>(Arrays.asList(
+            PKG_DREAMX,
+            PKG_SYSTEMUI,
+            "com.spotify.tv.android",
+            "com.spotify.music",
+            "com.google.android.apps.youtube.music"
+    ));
+
     public static volatile boolean isConnected = false;
 
     private volatile String foregroundPackage = null;
+    private View keepScreenOnOverlay = null;
+    private AudioManager audioManager = null;
+    private AudioManager.AudioPlaybackCallback audioPlaybackCallback = null;
+
+    public static boolean isWakeExemptPackage(String pkg, String launcherPkg) {
+        if (pkg == null) return true;
+        if (launcherPkg != null && launcherPkg.equals(pkg)) return true;
+        return EXEMPT_WAKE_PACKAGES.contains(pkg);
+    }
+
+    public boolean isMediaPlaying() {
+        if (audioManager == null) {
+            audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        }
+        if (audioManager == null) return false;
+
+        boolean isMusicActive = audioManager.isMusicActive();
+        if (isMusicActive) {
+            return true;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                List<AudioPlaybackConfiguration> configs = audioManager.getActivePlaybackConfigurations();
+                if (configs != null) {
+                    for (AudioPlaybackConfiguration config : configs) {
+                        AudioAttributes attrs = config.getAudioAttributes();
+                        if (attrs != null) {
+                            int usage = attrs.getUsage();
+                            if (usage == AudioAttributes.USAGE_MEDIA
+                                    || usage == AudioAttributes.USAGE_GAME
+                                    || usage == AudioAttributes.USAGE_UNKNOWN) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable ignored) {}
+        }
+        return false;
+    }
+
+    public boolean shouldKeepScreenOn(String pkg) {
+        if (isWakeExemptPackage(pkg, getPackageName())) {
+            return false;
+        }
+        return isMediaPlaying();
+    }
+
+    private String getOrResolveForegroundPackage() {
+        if (foregroundPackage != null) {
+            return foregroundPackage;
+        }
+        try {
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                CharSequence pkg = root.getPackageName();
+                root.recycle();
+                if (pkg != null) {
+                    foregroundPackage = pkg.toString();
+                    return foregroundPackage;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return null;
+    }
+
+    private void updateScreenWakeState() {
+        updateScreenWakeState(getOrResolveForegroundPackage());
+    }
+
+    private void updateScreenWakeState(String pkg) {
+        if (pkg == null) {
+            pkg = getOrResolveForegroundPackage();
+        }
+        boolean needed = shouldKeepScreenOn(pkg);
+        if (needed && keepScreenOnOverlay == null) {
+            try {
+                WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+                if (wm != null) {
+                    keepScreenOnOverlay = new View(this);
+                    WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                            1, 1,
+                            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                                    | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            PixelFormat.TRANSLUCENT
+                    );
+                    params.gravity = Gravity.TOP | Gravity.START;
+                    wm.addView(keepScreenOnOverlay, params);
+                    Log.i(TAG, "Attached FLAG_KEEP_SCREEN_ON overlay for active media in " + pkg);
+                }
+            } catch (Throwable t) {
+                Log.w(TAG, "Failed to attach keep-screen-on overlay", t);
+                keepScreenOnOverlay = null;
+            }
+        } else if (!needed && keepScreenOnOverlay != null) {
+            detachKeepScreenOnOverlay();
+            Log.i(TAG, "Removed keep-screen-on overlay (pkg=" + pkg + ")");
+        }
+    }
+
+    private void detachKeepScreenOnOverlay() {
+        if (keepScreenOnOverlay != null) {
+            try {
+                WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+                if (wm != null) {
+                    wm.removeView(keepScreenOnOverlay);
+                }
+            } catch (Throwable ignored) {}
+            keepScreenOnOverlay = null;
+        }
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event != null && event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             CharSequence pkg = event.getPackageName();
             if (pkg != null) {
-                foregroundPackage = pkg.toString();
+                String pkgStr = pkg.toString();
+                if (getPackageName().equals(pkgStr)) {
+                    CharSequence cls = event.getClassName();
+                    if (cls == null || !MainActivity.class.getName().contentEquals(cls)) {
+                        // Ignore events from our own non-MainActivity components (such as our keep-screen-on overlay)
+                        return;
+                    }
+                }
+                Log.i(TAG, "onAccessibilityEvent: foregroundPackage=" + pkgStr);
+                foregroundPackage = pkgStr;
+                updateScreenWakeState(foregroundPackage);
             }
         }
     }
@@ -61,17 +209,59 @@ public class GlobalKeyService extends AccessibilityService {
         info.flags |= AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS;
         setServiceInfo(info);
         Log.i(TAG, "GlobalKeyService connected: flags=" + info.flags);
+
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioManager != null) {
+            audioPlaybackCallback = new AudioManager.AudioPlaybackCallback() {
+                @Override
+                public void onPlaybackConfigChanged(List<AudioPlaybackConfiguration> configs) {
+                    super.onPlaybackConfigChanged(configs);
+                    updateScreenWakeState();
+                }
+            };
+            try {
+                audioManager.registerAudioPlaybackCallback(audioPlaybackCallback, null);
+            } catch (Throwable t) {
+                Log.w(TAG, "Failed to register audio playback callback", t);
+            }
+        }
+
+        try {
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                CharSequence pkg = root.getPackageName();
+                root.recycle();
+                if (pkg != null) {
+                    foregroundPackage = pkg.toString();
+                    updateScreenWakeState(foregroundPackage);
+                }
+            }
+        } catch (Throwable ignored) {}
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         isConnected = false;
+        detachKeepScreenOnOverlay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioManager != null && audioPlaybackCallback != null) {
+            try {
+                audioManager.unregisterAudioPlaybackCallback(audioPlaybackCallback);
+            } catch (Throwable ignored) {}
+            audioPlaybackCallback = null;
+        }
         return super.onUnbind(intent);
     }
 
     @Override
     public void onDestroy() {
         isConnected = false;
+        detachKeepScreenOnOverlay();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioManager != null && audioPlaybackCallback != null) {
+            try {
+                audioManager.unregisterAudioPlaybackCallback(audioPlaybackCallback);
+            } catch (Throwable ignored) {}
+            audioPlaybackCallback = null;
+        }
         super.onDestroy();
     }
 
@@ -340,6 +530,7 @@ public class GlobalKeyService extends AccessibilityService {
                 root.recycle();
                 if (pkg != null) {
                     foregroundPackage = pkg.toString();
+                    updateScreenWakeState(foregroundPackage);
                     return isTvPackage(foregroundPackage);
                 }
             }
@@ -358,6 +549,7 @@ public class GlobalKeyService extends AccessibilityService {
                 root.recycle();
                 if (pkg != null) {
                     foregroundPackage = pkg.toString();
+                    updateScreenWakeState(foregroundPackage);
                     return getPackageName().equals(foregroundPackage);
                 }
             }
