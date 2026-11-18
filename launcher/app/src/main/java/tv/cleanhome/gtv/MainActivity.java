@@ -65,6 +65,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1508,20 +1511,64 @@ public class MainActivity extends Activity {
         }
     }
 
+    Boolean lastDaytimeMood;
     List<Integer> cachedWallpapers;
 
+    boolean isDaytime() {
+        SharedPreferences prefs = getSharedPreferences("weather", MODE_PRIVATE);
+        String latStr = prefs.getString("lat", null);
+        String lonStr = prefs.getString("lon", null);
+        if (latStr != null && lonStr != null && !latStr.isEmpty() && !lonStr.isEmpty()) {
+            try {
+                double lat = Double.parseDouble(latStr);
+                double lon = Double.parseDouble(lonStr);
+                int[] times = Sun.riseAndSet(LocalDate.now(), lat, lon, ZoneId.systemDefault());
+                if (times != null) {
+                    LocalTime now = LocalTime.now();
+                    int minuteOfDay = now.getHour() * 60 + now.getMinute();
+                    return minuteOfDay >= times[0] && minuteOfDay < times[1];
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (prefs.contains("is_day")) {
+            long age = System.currentTimeMillis() - prefs.getLong("at", 0);
+            if (age < 30 * 60 * 1000L) {
+                return prefs.getInt("is_day", 1) == 1;
+            }
+        }
+        int hour = LocalTime.now().getHour();
+        return hour >= 7 && hour < 19;
+    }
+
     List<Integer> defaultWallpapers() {
-        if (cachedWallpapers != null) return cachedWallpapers;
+        boolean day = isDaytime();
+        if (cachedWallpapers != null && lastDaytimeMood != null && lastDaytimeMood == day) {
+            return cachedWallpapers;
+        }
+        String prefix = day ? "wallpaper_day_" : "wallpaper_night_";
+        List<Integer> list = scanWallpapers(prefix);
+        if (list.isEmpty()) {
+            list = scanWallpapers(day ? "wallpaper_night_" : "wallpaper_day_");
+            if (list.isEmpty()) {
+                list = scanWallpapers("wallpaper_");
+            }
+        }
+        lastDaytimeMood = day;
+        cachedWallpapers = list;
+        return list;
+    }
+
+    private List<Integer> scanWallpapers(String prefix) {
         List<Integer> list = new ArrayList<>();
         for (int i = 1; i <= 50; i++) {
-            int id = getResources().getIdentifier("wallpaper_" + i, "drawable", getPackageName());
+            int id = getResources().getIdentifier(prefix + i, "drawable", getPackageName());
             if (id != 0) {
                 list.add(id);
             } else {
                 break;
             }
         }
-        cachedWallpapers = list;
         return list;
     }
 
@@ -1697,7 +1744,9 @@ public class MainActivity extends Activity {
                 JSONObject now = new JSONObject(get("https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,is_day"
                         + "&latitude=" + prefs.getString("lat", "") + "&longitude=" + prefs.getString("lon", "")
                         + "&temperature_unit=" + unit)).getJSONObject("current");
-                String text = sky(now.getInt("weather_code"), now.optInt("is_day", 1) == 1)
+                int isDay = now.optInt("is_day", 1);
+                prefs.edit().putInt("is_day", isDay).apply();
+                String text = sky(now.getInt("weather_code"), isDay == 1)
                         + "  " + Math.round(now.getDouble("temperature_2m")) + symbol;
                 ui.post(() -> {
                     weather.setText(text);
