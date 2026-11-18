@@ -1097,7 +1097,8 @@ public class MainActivity extends Activity {
         }
         if (GlobalKeyService.isListKey(k)) {
             if (e.getAction() == KeyEvent.ACTION_DOWN && e.getRepeatCount() == 0) {
-                openLiveTv();
+                selectTab(tabApps);
+                tabApps.requestFocus();
             }
             return true;
         }
