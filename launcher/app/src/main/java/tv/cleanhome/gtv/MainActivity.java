@@ -1508,13 +1508,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    List<Integer> cachedWallpapers;
+
     List<Integer> defaultWallpapers() {
+        if (cachedWallpapers != null) return cachedWallpapers;
         List<Integer> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= 50; i++) {
             int id = getResources().getIdentifier("wallpaper_" + i, "drawable", getPackageName());
-            if (id != 0) list.add(id);
-            else if (i > 5) break;
+            if (id != 0) {
+                list.add(id);
+            } else {
+                break;
+            }
         }
+        cachedWallpapers = list;
         return list;
     }
 
