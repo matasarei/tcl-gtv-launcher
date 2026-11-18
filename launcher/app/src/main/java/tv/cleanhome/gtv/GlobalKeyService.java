@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
 public class GlobalKeyService extends AccessibilityService {
@@ -144,6 +145,15 @@ public class GlobalKeyService extends AccessibilityService {
         }
 
         if (isListKey(code)) {
+            if (isTvForeground()) {
+                Log.i(TAG, "TV app is foreground; delegating list key " + code + " to native TV channel list");
+                return super.onKeyEvent(event);
+            }
+            if (isLauncherForeground()) {
+                Log.i(TAG, "Launcher is foreground; routing list key " + code + " to Apps tab");
+                openApps();
+                return true;
+            }
             Log.i(TAG, "Intercepted list key " + code + " outside TV, opening Live TV");
             openLiveTv();
             return true;
@@ -215,9 +225,7 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     public static boolean isAppsKey(int code) {
-        return code == KEYCODE_BOOKMARK ||
-                code == KeyEvent.KEYCODE_BOOKMARK ||
-                code == 284 ||
+        return code == 284 ||
                 code == KeyEvent.KEYCODE_ALL_APPS ||
                 code == KEYCODE_TCL_ALL_APP ||
                 code == KEYCODE_TCL_EXIT ||
@@ -261,7 +269,9 @@ public class GlobalKeyService extends AccessibilityService {
     }
 
     public static boolean isListKey(int code) {
-        return code == KEYCODE_TCL_LIST ||
+        return code == KEYCODE_BOOKMARK ||
+                code == KeyEvent.KEYCODE_BOOKMARK ||
+                code == KEYCODE_TCL_LIST ||
                 code == KEYCODE_TCL_RECORD_LIST;
     }
 
@@ -308,8 +318,51 @@ public class GlobalKeyService extends AccessibilityService {
         }
     }
 
+    public static boolean isTvPackage(String pkg) {
+        if (pkg == null) return false;
+        return LaunchHelper.PKG_TV.equals(pkg) ||
+                "com.tcl.tvinput".equals(pkg) ||
+                "com.android.tv".equals(pkg) ||
+                "com.google.android.tv".equals(pkg) ||
+                "com.tcl.channelist".equals(pkg) ||
+                pkg.startsWith("com.tcl.tv") ||
+                pkg.contains("channellist");
+    }
+
     private boolean isTvForeground() {
-        return LaunchHelper.PKG_TV.equals(foregroundPackage) || "com.tcl.tvinput".equals(foregroundPackage);
+        if (isTvPackage(foregroundPackage)) {
+            return true;
+        }
+        try {
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                CharSequence pkg = root.getPackageName();
+                root.recycle();
+                if (pkg != null) {
+                    foregroundPackage = pkg.toString();
+                    return isTvPackage(foregroundPackage);
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
+    private boolean isLauncherForeground() {
+        if (getPackageName().equals(foregroundPackage)) {
+            return true;
+        }
+        try {
+            AccessibilityNodeInfo root = getRootInActiveWindow();
+            if (root != null) {
+                CharSequence pkg = root.getPackageName();
+                root.recycle();
+                if (pkg != null) {
+                    foregroundPackage = pkg.toString();
+                    return getPackageName().equals(foregroundPackage);
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
     }
 
     private void openLiveTv() {

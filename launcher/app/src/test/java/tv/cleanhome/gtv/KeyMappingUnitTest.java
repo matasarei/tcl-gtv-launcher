@@ -83,7 +83,7 @@ public class KeyMappingUnitTest {
         int keySettingsNotification = 83; // KEYCODE_NOTIFICATION
         int keyPeopleProfileSwitch = 288; // KEYCODE_PROFILE_SWITCH
         int keyTvButton = 4001;           // 0x000c005b / KEYCODE_TCL_EPG
-        int keyAppsBookmark = 174;        // KEYCODE_BOOKMARK
+        int keyListBookmark = 174;        // KEYCODE_BOOKMARK (TCL remote List button)
         int keyAppsAllApps = 284;         // KEYCODE_ALL_APPS
         int keyAppsTcl = 4082;            // KEYCODE_TCL_ALL_APP
         int keyYouTubeButton3 = 190;      // KEYCODE_BUTTON_3
@@ -108,7 +108,6 @@ public class KeyMappingUnitTest {
         assertTrue("TV2 TV fallback (170)", GlobalKeyService.isTvKey(170));
 
         // Apps button
-        assertTrue("TV2 apps bookmark (174)", GlobalKeyService.isAppsKey(keyAppsBookmark));
         assertTrue("TV2 apps all_apps (284)", GlobalKeyService.isAppsKey(keyAppsAllApps));
         assertTrue("TV2 apps tcl_all_app (4082)", GlobalKeyService.isAppsKey(keyAppsTcl));
 
@@ -125,14 +124,15 @@ public class KeyMappingUnitTest {
         // Inputs button
         assertTrue("TV2 Inputs button (178)", GlobalKeyService.isInputKey(keyInputs));
 
-        // Channel list
+        // Channel list / List key
+        assertTrue("TV2 List key (174)", GlobalKeyService.isListKey(keyListBookmark));
         assertTrue("TV2 List key (4090)", GlobalKeyService.isListKey(keyList));
 
         // All should be marked handled by GlobalKeyService outside TV
         assertTrue(GlobalKeyService.isHandledKey(keySettingsNotification, false));
         assertTrue(GlobalKeyService.isHandledKey(keyPeopleProfileSwitch, false));
         assertTrue(GlobalKeyService.isHandledKey(keyTvButton, false));
-        assertTrue(GlobalKeyService.isHandledKey(keyAppsBookmark, false));
+        assertTrue(GlobalKeyService.isHandledKey(keyListBookmark, false));
         assertTrue(GlobalKeyService.isHandledKey(keyYouTubeButton3, false));
         assertTrue(GlobalKeyService.isHandledKey(keyNetflixOem, false));
         assertTrue(GlobalKeyService.isHandledKey(keyPrimeVideoOem, false));
@@ -175,6 +175,13 @@ public class KeyMappingUnitTest {
         // Prime Video button 4099 MUST NOT trigger Netflix or YouTube
         assertFalse("4099 must not be Netflix", GlobalKeyService.isNetflixKey(4099));
         assertFalse("4099 must not be YouTube", GlobalKeyService.isYouTubeKey(4099));
+
+        // List button 174 MUST NOT trigger Apps, Settings, TV, Input, or YouTube
+        assertFalse("174 must not be Apps", GlobalKeyService.isAppsKey(174));
+        assertFalse("174 must not be Settings", GlobalKeyService.isSettingsKey(174));
+        assertFalse("174 must not be TV", GlobalKeyService.isTvKey(174));
+        assertFalse("174 must not be Input", GlobalKeyService.isInputKey(174));
+        assertFalse("174 must not be YouTube", GlobalKeyService.isYouTubeKey(174));
     }
 
     @Test
@@ -201,5 +208,18 @@ public class KeyMappingUnitTest {
             assertFalse("Key " + k + " must not be handled by GlobalKeyService",
                     GlobalKeyService.isHandledKey(k, false));
         }
+    }
+
+    @Test
+    public void testTvForegroundDelegation() {
+        // When TV app is in foreground, List keys (174, 4090, 4126) must delegate to native TV channel list
+        assertFalse("List key 174 must delegate when TV is foreground", GlobalKeyService.isHandledKey(174, true));
+        assertFalse("List key 4090 must delegate when TV is foreground", GlobalKeyService.isHandledKey(4090, true));
+        assertFalse("Record list key 4126 must delegate when TV is foreground", GlobalKeyService.isHandledKey(4126, true));
+
+        // When TV is NOT foreground, List keys must be handled (to launch TV / Apps)
+        assertTrue("List key 174 must be handled when TV is background", GlobalKeyService.isHandledKey(174, false));
+        assertTrue("List key 4090 must be handled when TV is background", GlobalKeyService.isHandledKey(4090, false));
+        assertTrue("Record list key 4126 must be handled when TV is background", GlobalKeyService.isHandledKey(4126, false));
     }
 }
